@@ -24,8 +24,8 @@ Example:
     alert(myModel.getBookInfo());
 
  * Brief aside on super: JavaScript does not provide a simple way to call super — the function of the same name defined
- * higher on the prototype chain. If you override a core function like set (get, unset, watch, unwatch, trigger),
- * and you want to invoke the parent object's implementation, you'll have to explicitly call it, along these lines:
+ higher on the prototype chain. If you override a core function like set (get, unset, watch, unwatch, trigger),
+ and you want to invoke the parent object's implementation, you'll have to explicitly call it, along these lines:
 Example:
 
     var MyModel = Rack.Model.extend({
