@@ -1,4 +1,5 @@
-Rack.Model
+Rack.Model API
+======
 ======
 
 1. extend
