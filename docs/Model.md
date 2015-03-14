@@ -31,7 +31,6 @@ Example:
     var MyModel = Rack.Model.extend({
         set: function(attributes) {
             Rack.Model.prototype.set.call(this, arguments);
-            ...
         }
     });
 
