@@ -1,8 +1,8 @@
-MODEL
+Rack.Model
 ======
 
 1. extend
-==========
+=======
 To create a Model class of your own, you extend Rack.Model and provide instance properties,
 as well options to be attached directly to the constructor function.
 
@@ -23,11 +23,9 @@ Example:
 
     alert(myModel.getBookInfo());
 
-/*
  * Brief aside on super: JavaScript does not provide a simple way to call super — the function of the same name defined
  * higher on the prototype chain. If you override a core function like set (get, unset, watch, unwatch, trigger),
  * and you want to invoke the parent object's implementation, you'll have to explicitly call it, along these lines:
- */
 Example:
 
     var MyModel = Rack.Model.extend({
@@ -38,7 +36,7 @@ Example:
     });
 
 2. get
-========
+=======
 model.get(attribute)
 
 Get the current value of an attribute from the model. For example:
@@ -46,7 +44,7 @@ Get the current value of an attribute from the model. For example:
     myModel.get("title")
 
 3. set
-========
+=======
 model.set(attributes)
 
 Set a hash of attributes (one or many) on the model.
@@ -59,7 +57,7 @@ or
     myModel.set("title", "A Scandal in Bohemia");
 
 4. unset
-=========
+======
 model.unset(attribute)
 
 Remove an attribute by deleting it from the internal attributes.
@@ -67,7 +65,7 @@ Remove an attribute by deleting it from the internal attributes.
     myModel.unset("title")
 
 5. clear
-=========
+======
 model.clear()
 
 Removes all attributes from the model.
