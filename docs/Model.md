@@ -9,8 +9,7 @@ extend correctly sets up the prototype chain, so subclasses created with the bel
 can be further extended and subclassed as far as you like.
 Example:
 
-
-    ```javascript
+ ```javascript
     var MyModel = Rack.Model.extend({
         getBookInfo: function() {
             return this.get('title') + ' - ' + this.get('author');
@@ -23,7 +22,7 @@ Example:
     });
     
     alert(myModel.getBookInfo());
-    ```
+```
 
  * Brief aside on super: JavaScript does not provide a simple way to call super — the function of the same name defined
  higher on the prototype chain. If you override a core function like set (get, unset, watch, unwatch, trigger),
