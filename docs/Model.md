@@ -32,7 +32,7 @@ Example:
     ```javascript
     var MyModel = Rack.Model.extend({
         set: function(attributes) {
-            Rack.Model.prototype.set.call(this, arguments);
+           MyModel.__super__.set.apply(this, arguments);
             ...
         }
     });
