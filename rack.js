@@ -271,7 +271,7 @@
     });
     //-----------------------------
 
-    //Rack.Model
+    //Rack.View
     //----------
     var View = Rack.View = function (attributes, options) {
         this.attributes = attributes || {};
@@ -297,6 +297,7 @@
             if(this.className) this.el.setAttribute('class', this.className);
         }
     });
+    //-------------
 
     Model.extend = View.extend = extend;
 
