@@ -270,7 +270,35 @@
         }
     });
     //-----------------------------
-    Model.extend = extend;
+
+    //Rack.Model
+    //----------
+    var View = Rack.View = function (attributes, options) {
+        this.attributes = attributes || {};
+        this.options = options || {};
+        this.initialize.apply(this, arguments);
+    };
+
+    Helpers.extend(View, {
+        container: document.body,
+        tagName: 'div',
+        id: '',
+        className: '',
+        initialize: function() {
+            this.render();
+        },
+        render: function () {
+            this.setupViewEl();
+            this.container.appendChild(this.el);
+        },
+        setupViewEl: function() {
+            this.el = document.createElement(this.tagName);
+            if(this.id) this.el.setAttribute('id', this.id);
+            if(this.className) this.el.setAttribute('class', this.className);
+        }
+    });
+
+    Model.extend = View.extend = extend;
 
     return Rack;
 });
