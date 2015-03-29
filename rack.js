@@ -104,6 +104,51 @@
     };
     //-------------------------
 
+    // Rack.SyncService
+    //----------------
+    var SyncService = Rack.SyncService = function () {
+        throw new Error("The instance shouldn\'t be created");
+    };
+
+    /**
+     *
+     * @param url - {String}
+     * @param data - {*}
+     * @param method - {String}
+     * @param resolve - {Function}
+     * @param reject - {Function}
+     */
+    SyncService.sendRequest = function (url, data, method, resolve, reject) {
+        var xhr = (function () {
+            var xmlhttp;
+            try {
+                xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
+            } catch (e) {
+                try {
+                    xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+                } catch (E) {
+                    xmlhttp = false;
+                }
+            }
+            if (!xmlhttp && typeof XMLHttpRequest != 'undefined') {
+                xmlhttp = new XMLHttpRequest();
+            }
+            return xmlhttp;
+        })();
+
+        xhr.open(method, url, true);
+        xhr.onreadystatechange = function () {
+            if (this.readyState == 4) {
+                if (this.status == 200) {
+                    resolve(xhr.responseText);
+                } else {
+                    reject(xhr.errorCode);
+                }
+            }
+        };
+        xhr.send(data);
+    };
+
     //Rack.Model
     //----------
     var Model = Rack.Model = function (attributes, options) {
@@ -113,10 +158,17 @@
         this.changed = true;
         this.listenersObj = {};
         this.set(this.attributes);
+        this.initialize.apply(this, arguments);
     };
 
     Helpers.extend(Model, {
-
+        /**
+         * virtual @method initialize
+         * initialization logic
+         */
+        initialize: function () {
+            console.warn('@method initialize isn\'t implemented');
+        },
         /**
          * @method set - set property as model attributes
          *
@@ -273,28 +325,75 @@
 
     //Rack.View
     //----------
-    var View = Rack.View = function (attributes, options) {
-        this.attributes = attributes || {};
+    var View = Rack.View = function (options) {
         this.options = options || {};
+        this.eventsMap = [];
         this.initialize.apply(this, arguments);
+        this.delegateEvents();
     };
 
     Helpers.extend(View, {
+        templateId: '',
         container: document.body,
         tagName: 'div',
         id: '',
         className: '',
-        initialize: function() {
+        events: {},
+        undelegateEvents: function () {
+            if (!this.eventsMap.length) return false;
+            this.eventsMap.forEach(function (val) {
+                val.el.removeEventListener(val.type, val.handler, false);
+            });
+            this.eventsMap = [];
+        },
+        remove: function () {
+            this.undelegateEvents();
+            this.container.removeChild(this.el);
+            return this;
+        },
+        delegateEvents: function () {
+            if(!this.eventsMap.length) return false;
+            this.eventsMap.forEach(function (val) {
+                val.el.addEventListener(val.type, val.handler, false);
+            });
+        },
+        initialize: function () {
             this.render();
         },
         render: function () {
-            this.setupViewEl();
-            this.container.appendChild(this.el);
+            this.setViewElement();
         },
-        setupViewEl: function() {
+        setViewElement: function () {
             this.el = document.createElement(this.tagName);
-            if(this.id) this.el.setAttribute('id', this.id);
-            if(this.className) this.el.setAttribute('class', this.className);
+            if (this.id) this.el.setAttribute('id', this.id);
+            if (this.className) this.el.setAttribute('class', this.className);
+            this.el.innerHTML = document.getElementById(this.templateId).innerHTML.trim();
+            this.container.appendChild(this.el);
+            var events = this.events;
+            if (!events) return false;
+            for (var key in events) {
+                if (events.hasOwnProperty(key)) {
+                    var parsedArr = key.split(' '),
+                        eventType = parsedArr.shift();
+                    if (parsedArr.length) {
+                        var nodesList = document.querySelectorAll(parsedArr.join(' ')),
+                            nodeArr = Array.prototype.slice.call(nodesList);
+                        nodeArr.forEach(function (val) {
+                            this.eventsMap.push({
+                                el: val,
+                                type: eventType,
+                                handler: this[events[key]].bind(this)
+                            });
+                        }.bind(this));
+                    } else {
+                        this.eventsMap.push({
+                            el: this.el,
+                            type: eventType,
+                            handler: this[events[key]].bind(this)
+                        });
+                    }
+                }
+            }
         }
     });
     //-------------
