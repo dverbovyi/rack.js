@@ -118,7 +118,8 @@
      * @param resolve - {Function}
      * @param reject - {Function}
      */
-    SyncService.sendRequest = function (url, data, method, resolve, reject) {
+    SyncService.sendRequest = function (url, data, method, resolve, reject, async) {
+        var asyncReq = async || true;
         var xhr = (function () {
             var xmlhttp;
             try {
@@ -136,17 +137,23 @@
             return xmlhttp;
         })();
 
-        xhr.open(method, url, true);
+        xhr.open(method, url, asyncReq);
         xhr.onreadystatechange = function () {
             if (this.readyState == 4) {
                 if (this.status == 200) {
                     resolve(xhr.responseText);
                 } else {
-                    reject(xhr.errorCode);
+                    reject(xhr);
                 }
             }
         };
         xhr.send(data);
+    };
+
+    SyncService.getTemplate = function(url) {
+        return new Promise(function(resolve, reject){
+            this.sendRequest(url, null, 'GET', resolve, reject, true);
+        }.bind(this));
     };
 
     //Rack.Model
@@ -329,18 +336,18 @@
         this.options = options || {};
         this.eventsMap = [];
         this.initialize.apply(this, arguments);
-        this.delegateEvents();
     };
 
     Helpers.extend(View, {
         templateId: '',
+        templatePath: '',
         container: document.body,
         tagName: 'div',
         id: '',
         className: '',
         events: {},
         undelegateEvents: function () {
-            if (!this.eventsMap.length) return false;
+            if (!this.eventsMap.length) return;
             this.eventsMap.forEach(function (val) {
                 val.el.removeEventListener(val.type, val.handler, false);
             });
@@ -352,7 +359,7 @@
             return this;
         },
         delegateEvents: function () {
-            if(!this.eventsMap.length) return false;
+            if(!this.eventsMap.length) return;
             this.eventsMap.forEach(function (val) {
                 val.el.addEventListener(val.type, val.handler, false);
             });
@@ -361,22 +368,33 @@
             this.render();
         },
         render: function () {
-            this.setViewElement();
-        },
-        setViewElement: function () {
             this.el = document.createElement(this.tagName);
             if (this.id) this.el.setAttribute('id', this.id);
             if (this.className) this.el.setAttribute('class', this.className);
-            this.el.innerHTML = document.getElementById(this.templateId).innerHTML.trim();
+            if(document.getElementById(this.templateId)) {
+                this.el.innerHTML = document.getElementById(this.templateId).innerHTML.replace(/\s+/g, '');
+                this.setupViewEvents();
+            } else if(this.templatePath)
+                SyncService.getTemplate(this.templatePath).then(function(response){
+                    var linesArr = response.split(/\r?\n/);
+                    linesArr.shift();
+                    linesArr.pop();
+                    this.el.innerHTML = linesArr.join('').replace(/\s+/g, '');
+                    this.setupViewEvents();
+                }.bind(this), function(xhr){
+                    throw new Error(xhr.responseURL+' '+xhr.statusText);
+                });
             this.container.appendChild(this.el);
+        },
+        setupViewEvents: function () {
             var events = this.events;
-            if (!events) return false;
+            if (!events) return;
             for (var key in events) {
                 if (events.hasOwnProperty(key)) {
                     var parsedArr = key.split(' '),
                         eventType = parsedArr.shift();
                     if (parsedArr.length) {
-                        var nodesList = document.querySelectorAll(parsedArr.join(' ')),
+                        var nodesList = this.el.querySelectorAll(parsedArr.join(' ')),
                             nodeArr = Array.prototype.slice.call(nodesList);
                         nodeArr.forEach(function (val) {
                             this.eventsMap.push({
@@ -394,6 +412,7 @@
                     }
                 }
             }
+            this.delegateEvents();
         }
     });
     //-------------
