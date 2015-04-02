@@ -339,9 +339,10 @@
 
     //Rack.View
     //----------
-    var View = Rack.View = function (options) {
-        this.options = options || {};
+    var View = Rack.View = function (attributes) {
+        this.attributes = attributes || {};
         this.eventsMap = [];
+        this.setAttributes();
         this.initialize.apply(this, arguments);
     };
 
@@ -353,6 +354,12 @@
         id: '',
         className: '',
         events: {},
+        setAttributes: function() {
+            if(Object.keys(this.attributes).length)
+                for(var key in this.attributes) {
+                    this[key] = this.attributes[key];
+                }
+        },
         undelegateEvents: function () {
             if (!this.eventsMap.length) return;
             this.eventsMap.forEach(function (val) {
