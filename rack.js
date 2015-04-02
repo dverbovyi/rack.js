@@ -104,9 +104,9 @@
     };
     //-------------------------
 
-    // Rack.SyncService
+    // Rack.Service
     //----------------
-    var SyncService = Rack.SyncService = function () {
+    var Service = Rack.Service = function () {
         throw new Error("The instance shouldn\'t be created");
     };
 
@@ -118,7 +118,7 @@
      * @param resolve - {Function}
      * @param reject - {Function}
      */
-    SyncService.sendRequest = function (url, data, method, resolve, reject, async) {
+    Service.sendRequest = function (url, data, method, resolve, reject, async) {
         var asyncReq = async || true;
         var xhr = (function () {
             var xmlhttp;
@@ -150,17 +150,18 @@
         xhr.send(data);
     };
 
-    SyncService.get = function(url, async) {
+    Service.get = function(url, async) {
         return new Promise(function(resolve, reject){
             this.sendRequest(url, null, 'GET', resolve, reject, async);
         }.bind(this));
     };
 
-    SyncService.post = function(url, data, async) {
+    Service.post = function(url, data, async) {
         return new Promise(function(resolve, reject){
             this.sendRequest(url, data, 'POST', resolve, reject, async);
         }.bind(this));
     };
+    //-----------------------
 
     //Rack.Model
     //----------
@@ -381,7 +382,7 @@
                 this.el.innerHTML = document.getElementById(this.templateId).innerHTML.replace(/\s+/g, '');
                 this.setupViewEvents();
             } else if(this.templatePath)
-                SyncService.get(this.templatePath, true).then(function(response){
+                Service.get(this.templatePath, true).then(function(response){
                     var linesArr = response.split(/\r?\n/);
                     linesArr.shift();
                     linesArr.pop();
