@@ -150,9 +150,15 @@
         xhr.send(data);
     };
 
-    SyncService.getTemplate = function(url) {
+    SyncService.get = function(url, async) {
         return new Promise(function(resolve, reject){
-            this.sendRequest(url, null, 'GET', resolve, reject, true);
+            this.sendRequest(url, null, 'GET', resolve, reject, async);
+        }.bind(this));
+    };
+
+    SyncService.post = function(url, data, async) {
+        return new Promise(function(resolve, reject){
+            this.sendRequest(url, data, 'POST', resolve, reject, async);
         }.bind(this));
     };
 
@@ -375,7 +381,7 @@
                 this.el.innerHTML = document.getElementById(this.templateId).innerHTML.replace(/\s+/g, '');
                 this.setupViewEvents();
             } else if(this.templatePath)
-                SyncService.getTemplate(this.templatePath).then(function(response){
+                SyncService.get(this.templatePath, true).then(function(response){
                     var linesArr = response.split(/\r?\n/);
                     linesArr.shift();
                     linesArr.pop();
