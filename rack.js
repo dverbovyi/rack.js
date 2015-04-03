@@ -354,6 +354,7 @@
         id: '',
         className: '',
         events: {},
+        templateContainer: document.body,
         setAttributes: function() {
             if(Object.keys(this.attributes).length)
                 for(var key in this.attributes) {
@@ -370,6 +371,8 @@
         remove: function () {
             this.undelegateEvents();
             this.container.removeChild(this.el);
+            if(this.template)
+                this.templateContainer.removeChild(this.template);
             return this;
         },
         delegateEvents: function () {
@@ -381,23 +384,33 @@
         initialize: function () {
             this.render();
         },
+        parseTemplate: function(template) {
+            this.template = template;
+            this.el.innerHTML = this.template.innerHTML;
+            this.setupViewEvents();
+        },
         render: function () {
+            if(this.el)
+                this.remove();
             this.el = document.createElement(this.tagName);
             if (this.id) this.el.setAttribute('id', this.id);
             if (this.className) this.el.setAttribute('class', this.className);
-            if(document.getElementById(this.templateId)) {
-                this.el.innerHTML = document.getElementById(this.templateId).innerHTML.replace(/\s+/g, '');
-                this.setupViewEvents();
-            } else if(this.templatePath)
+            var template = document.getElementById(this.templateId);
+            if(template)
+                this.parseTemplate(template);
+            else if(this.templatePath)
                 Service.get(this.templatePath, true).then(function(response){
-                    var linesArr = response.split(/\r?\n/);
-                    linesArr.shift();
-                    linesArr.pop();
-                    this.el.innerHTML = linesArr.join('').replace(/\s+/g, '');
-                    this.setupViewEvents();
+                    this.templateContainer.insertAdjacentHTML("beforeEnd", response);
+                    template = document.getElementById(this.templateId);
+                    if(template)
+                        this.parseTemplate(template);
+                    else
+                        throw new Error('Template with id "'+this.templateId+'" doesn\'t exist');
                 }.bind(this), function(xhr){
                     throw new Error(xhr.responseURL+' '+xhr.statusText);
                 });
+            else
+                throw new Error('Template with id "'+this.templateId+'" doesn\'t exist');
             this.container.appendChild(this.el);
         },
         setupViewEvents: function () {
