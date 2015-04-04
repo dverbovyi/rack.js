@@ -354,7 +354,6 @@
         id: '',
         className: '',
         events: {},
-        templateContainer: document.body,
         setAttributes: function() {
             if(Object.keys(this.attributes).length)
                 for(var key in this.attributes) {
@@ -371,6 +370,7 @@
         remove: function () {
             this.undelegateEvents();
             this.container.removeChild(this.el);
+            this.el = null;
             if(this.template)
                 this.templateContainer.removeChild(this.template);
             return this;
@@ -392,6 +392,13 @@
         render: function () {
             if(this.el)
                 this.remove();
+            this.templateContainer = document.getElementById('templates') || (function() {
+                    var el = document.createElement('div');
+                    el.setAttribute('id', 'templates');
+                    document.body.appendChild(el);
+                    return el;
+                })();
+
             this.el = document.createElement(this.tagName);
             if (this.id) this.el.setAttribute('id', this.id);
             if (this.className) this.el.setAttribute('class', this.className);
