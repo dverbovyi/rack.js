@@ -51,7 +51,8 @@
             Child.__super__ = Parent.prototype;
         } else {
             for (var key in Parent) {
-                Child.prototype[key] = Parent[key];
+                if(Parent.hasOwnProperty(key))
+                    Child.prototype[key] = Parent[key];
             }
             Child.constructor = Child;
             Child.__super__ = Parent;
