@@ -45,12 +45,16 @@
      */
     Helpers.extend = function (Child, Parent) {
         if (Helpers.getType(Parent) == 'Function') {
+            var Surrogate = function() {this.constructor = Child;};
+            Surrogate.prototype = Parent.prototype;
             Child.prototype = new Parent();
-            Child.constructor = Child;
+            Child.__super__ = Parent.prototype;
         } else {
             for (var key in Parent) {
                 Child.prototype[key] = Parent[key];
             }
+            Child.constructor = Child;
+            Child.__super__ = Parent;
         }
     };
 
@@ -168,6 +172,7 @@
     var Model = Rack.Model = function (attributes, options) {
         this.attributes = attributes || {};
         this.prevAttributes = {};
+        //TODO: defaults object should be implemented
         this.options = options || {};
         this.changed = true;
         this.listenersObj = {};
