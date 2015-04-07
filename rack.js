@@ -44,12 +44,13 @@
      * @param Parent - {Function|Object}
      */
     Helpers.extend = function (Child, Parent) {
-        if (Helpers.getType(Parent) == 'Function') {
+        var type = Helpers.getType(Parent);
+        if (type == 'Function') {
             var Surrogate = function() {this.constructor = Child;};
             Surrogate.prototype = Parent.prototype;
             Child.prototype = new Parent();
             Child.__super__ = Parent.prototype;
-        } else {
+        } else if(type == 'Object'){
             for (var key in Parent) {
                 if(Parent.hasOwnProperty(key))
                     Child.prototype[key] = Parent[key];
@@ -170,13 +171,12 @@
 
     //Rack.Model
     //----------
-    var Model = Rack.Model = function (attributes, options) {
+    var Model = Rack.Model = function (attributes) {
         this.attributes = attributes || {};
         this.prevAttributes = {};
-        //TODO: defaults object should be implemented
-        this.options = options || {};
         this.changed = true;
         this.listenersObj = {};
+        if(this.defaults&&Object.keys(this.defaults).length) this.set(this.defaults);
         this.set(this.attributes);
         this.initialize.apply(this, arguments);
     };
@@ -186,9 +186,7 @@
          * virtual @method initialize
          * initialization logic
          */
-        initialize: function () {
-            console.warn('@method initialize isn\'t implemented');
-        },
+        initialize: function () {},
         /**
          * @method set - set property as model attributes
          *
@@ -316,7 +314,6 @@
                     }
                 } else {
                     if (this.listenersObj[watchKey]) {
-                        alert(true);
                         this.listenersObj[watchKey]({
                             key: watchKey,
                             value: this.get(watchKey)
