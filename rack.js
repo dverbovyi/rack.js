@@ -176,7 +176,8 @@
         this.prevAttributes = {};
         this.changed = true;
         this.listenersObj = {};
-        if(this.defaults&&Object.keys(this.defaults).length) this.set(this.defaults);
+        var defaults = this.__proto__.defaults || {};
+        this.set(defaults);
         this.set(this.attributes);
         this.initialize.apply(this, arguments);
     };
@@ -350,6 +351,7 @@
     };
 
     Helpers.extend(View, {
+        model: null,
         templateId: '',
         templatePath: '',
         container: document.body,
@@ -389,7 +391,16 @@
         },
         parseTemplate: function(template) {
             this.template = template;
-            this.el.innerHTML = this.template.innerHTML;
+            var source = this.template.innerHTML;
+            if(this.model) {
+                var modelAttr = this.model.toJSON();
+                for(var key in modelAttr) {
+                    if(modelAttr.hasOwnProperty(key))
+                        source = source.replace(new RegExp('{{'+key+'}}',"g"), modelAttr[key]);
+                }
+            }
+
+            this.el.innerHTML = source;
             this.setupViewEvents();
         },
         render: function () {
