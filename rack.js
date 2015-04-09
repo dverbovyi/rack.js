@@ -44,15 +44,17 @@
      * @param Parent - {Function|Object}
      */
     Helpers.extend = function (Child, Parent) {
-        var type = Helpers.getType(Parent);
+        var type = this.getType(Parent);
         if (type == 'Function') {
-            var Surrogate = function() {this.constructor = Child;};
+            var Surrogate = function () {
+                this.constructor = Child;
+            };
             Surrogate.prototype = Parent.prototype;
             Child.prototype = new Parent();
             Child.__super__ = Parent.prototype;
-        } else if(type == 'Object'){
+        } else if (type == 'Object') {
             for (var key in Parent) {
-                if(Parent.hasOwnProperty(key))
+                if (Parent.hasOwnProperty(key))
                     Child.prototype[key] = Parent[key];
             }
             Child.constructor = Child;
@@ -108,6 +110,25 @@
         }
         return typeString;
     };
+
+    /**
+     *
+     * @param array - {Array}
+     * @returns {Array}
+     */
+    Helpers.getUnique = function (array) {
+        if(this.getType(array) != 'Array')
+            throw new Error(array+' isn\'t Array');
+        var u = {}, a = [];
+        for (var i = 0, l = array.length; i < l; ++i) {
+            if (u.hasOwnProperty(array[i])) {
+                continue;
+            }
+            a.push(array[i]);
+            u[array[i]] = 1;
+        }
+        return a;
+    };
     //-------------------------
 
     // Rack.Service
@@ -156,14 +177,14 @@
         xhr.send(data);
     };
 
-    Service.get = function(url, async) {
-        return new Promise(function(resolve, reject){
+    Service.get = function (url, async) {
+        return new Promise(function (resolve, reject) {
             this.sendRequest(url, null, 'GET', resolve, reject, async);
         }.bind(this));
     };
 
-    Service.post = function(url, data, async) {
-        return new Promise(function(resolve, reject){
+    Service.post = function (url, data, async) {
+        return new Promise(function (resolve, reject) {
             this.sendRequest(url, data, 'POST', resolve, reject, async);
         }.bind(this));
     };
@@ -187,7 +208,8 @@
          * virtual @method initialize
          * initialization logic
          */
-        initialize: function () {},
+        initialize: function () {
+        },
         /**
          * @method set - set property as model attributes
          *
@@ -359,9 +381,9 @@
         id: '',
         className: '',
         events: {},
-        setAttributes: function() {
-            if(Object.keys(this.attributes).length)
-                for(var key in this.attributes) {
+        setAttributes: function () {
+            if (Object.keys(this.attributes).length)
+                for (var key in this.attributes) {
                     this[key] = this.attributes[key];
                 }
         },
@@ -376,12 +398,12 @@
             this.undelegateEvents();
             this.container.removeChild(this.el);
             this.el = null;
-            if(this.template)
+            if (this.template)
                 this.templateContainer.removeChild(this.template);
             return this;
         },
         delegateEvents: function () {
-            if(!this.eventsMap.length) return;
+            if (!this.eventsMap.length) return;
             this.eventsMap.forEach(function (val) {
                 val.el.addEventListener(val.type, val.handler, false);
             });
@@ -389,49 +411,63 @@
         initialize: function () {
             this.render();
         },
-        parseTemplate: function(template) {
+        parseTemplate: function (template) {
             this.template = template;
             var source = this.template.innerHTML;
-            if(this.model) {
-                var modelAttr = this.model.toJSON();
-                for(var key in modelAttr) {
-                    if(modelAttr.hasOwnProperty(key))
-                        source = source.replace(new RegExp('{{'+key+'}}',"g"), modelAttr[key]);
-                }
+            if (this.model) {
+                var templateKeys = {},
+                    trimedSource = source.replace(/\s+/g, ''),
+                    splited = trimedSource.match(/{{(.*)}}/g)[0].split('{{');
+                splited.shift();
+                splited.forEach(function (val) {
+                    var key = val.split('}}')[0];
+                    if(!templateKeys[key])
+                        templateKeys[key] = true;
+                });
+                Object.keys(templateKeys).forEach(function(val) {
+                    var valueArr = val.split('.'),
+                        modelValue = this.model.get(val);
+                    if(valueArr.length>1) {
+                        valueArr.forEach(function(value) {
+                            modelValue = modelValue&&modelValue[value] || this.model.get(value);
+                        }.bind(this));
+                    }
+                    source = source.replace(new RegExp('{{'+val+'}}',"g"), modelValue);
+                }.bind(this));
             }
 
             this.el.innerHTML = source;
             this.setupViewEvents();
         },
         render: function () {
-            if(this.el)
+            if (this.el)
                 this.remove();
-            this.templateContainer = document.getElementById('templates') || (function() {
-                    var el = document.createElement('div');
-                    el.setAttribute('id', 'templates');
-                    document.body.appendChild(el);
-                    return el;
-                })();
+            this.templateContainer = document.getElementById('templates') || (function () {
+                var el = document.createElement('div');
+                el.setAttribute('id', 'templates');
+                document.body.appendChild(el);
+                return el;
+            })();
 
             this.el = document.createElement(this.tagName);
             if (this.id) this.el.setAttribute('id', this.id);
             if (this.className) this.el.setAttribute('class', this.className);
             var template = document.getElementById(this.templateId);
-            if(template)
+            if (template)
                 this.parseTemplate(template);
-            else if(this.templatePath)
-                Service.get(this.templatePath, true).then(function(response){
+            else if (this.templatePath)
+                Service.get(this.templatePath, true).then(function (response) {
                     this.templateContainer.insertAdjacentHTML("beforeEnd", response);
                     template = document.getElementById(this.templateId);
-                    if(template)
+                    if (template)
                         this.parseTemplate(template);
                     else
-                        throw new Error('Template with id "'+this.templateId+'" doesn\'t exist');
-                }.bind(this), function(xhr){
-                    throw new Error(xhr.responseURL+' '+xhr.statusText);
+                        throw new Error('Template with id "' + this.templateId + '" doesn\'t exist');
+                }.bind(this), function (xhr) {
+                    throw new Error(xhr.responseURL + ' ' + xhr.statusText);
                 });
             else
-                throw new Error('Template with id "'+this.templateId+'" doesn\'t exist');
+                throw new Error('Template with id "' + this.templateId + '" doesn\'t exist');
             this.container.appendChild(this.el);
         },
         setupViewEvents: function () {
