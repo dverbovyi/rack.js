@@ -116,7 +116,7 @@
      * @param array - {Array}
      * @returns {Array}
      */
-    Helpers.getUnique = function (array) {
+    Helpers.uniqueArray = function (array) {
         if(this.getType(array) != 'Array')
             throw new Error(array+' isn\'t Array');
         var u = {}, a = [];
@@ -208,8 +208,7 @@
          * virtual @method initialize
          * initialization logic
          */
-        initialize: function () {
-        },
+        initialize: function () {},
         /**
          * @method set - set property as model attributes
          *
@@ -411,31 +410,61 @@
         initialize: function () {
             this.render();
         },
+
+        /**
+         *
+         * @param val - {String}
+         * @returns {*}
+         */
+        getParsedModelValue: function(val) {
+            var modelValue = null, parsedArr = [];
+            return (function(){
+                if(val.indexOf('.')+1) {
+                    var valueArr = val.split('.');
+                    if(valueArr.length>1) {
+                        valueArr.forEach(function(value) {
+                            if(value.indexOf('[')+1) {
+                                var splitedArr = value.split('['),
+                                    arrName = splitedArr[0],
+                                    index = splitedArr[1].split(']')[0].substring(0, splitedArr[1].length - 1);
+                                modelValue = modelValue[arrName][index];
+                            } else
+                                modelValue = modelValue&&modelValue[value] || this.model.get(value);
+                        }.bind(this));
+                    }
+                } else if(val.indexOf('[')+1) {
+                    var splitedArr = val.split('['),
+                        arrName = splitedArr[0],
+                        index = splitedArr[1].split(']')[0].substring(0, splitedArr[1].length - 1);
+                    modelValue = this.model.get(arrName)[index];
+                } else {
+                   modelValue = this.model.get(val);
+                }
+                return modelValue;
+            }.call(this));
+        },
+
+        /**
+         *
+         * @param template - {String}
+         */
         parseTemplate: function (template) {
             this.template = template;
             var source = this.template.innerHTML;
             if (this.model) {
-                var templateKeys = {},
+                var templateKeys = [],
                     trimedSource = source.replace(/\s+/g, ''),
                     splited = trimedSource.match(/{{(.*)}}/g)[0].split('{{');
                 splited.shift();
                 splited.forEach(function (val) {
                     var key = val.split('}}')[0];
-                    if(!templateKeys[key])
-                        templateKeys[key] = true;
+                    templateKeys.push(key);
                 });
-                Object.keys(templateKeys).forEach(function(val) {
-                    var valueArr = val.split('.'),
-                        modelValue = this.model.get(val);
-                    if(valueArr.length>1) {
-                        valueArr.forEach(function(value) {
-                            modelValue = modelValue&&modelValue[value] || this.model.get(value);
-                        }.bind(this));
-                    }
-                    source = source.replace(new RegExp('{{'+val+'}}',"g"), modelValue);
+                Helpers.uniqueArray(templateKeys).forEach(function(val) {
+                    var key = (val.indexOf('[')+1)&&val.replace('[', '\\[') || val;
+                    source = source.replace(new RegExp('{{'+key+'}}',"g"), this.getParsedModelValue(val));
                 }.bind(this));
             }
-
             this.el.innerHTML = source;
             this.setupViewEvents();
         },
@@ -448,7 +477,6 @@
                 document.body.appendChild(el);
                 return el;
             })();
-
             this.el = document.createElement(this.tagName);
             if (this.id) this.el.setAttribute('id', this.id);
             if (this.className) this.el.setAttribute('class', this.className);
