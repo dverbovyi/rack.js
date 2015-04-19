@@ -117,8 +117,8 @@
      * @returns {Array}
      */
     Helpers.uniqueArray = function (array) {
-        if(this.getType(array) != 'Array')
-            throw new Error(array+' isn\'t Array');
+        if (this.getType(array) != 'Array')
+            throw new Error(array + ' isn\'t Array');
         var u = {}, a = [];
         for (var i = 0, l = array.length; i < l; ++i) {
             if (u.hasOwnProperty(array[i])) {
@@ -208,7 +208,8 @@
          * virtual @method initialize
          * initialization logic
          */
-        initialize: function () {},
+        initialize: function () {
+        },
         /**
          * @method set - set property as model attributes
          *
@@ -416,34 +417,57 @@
          * @param val - {String}
          * @returns {*}
          */
-        getParsedModelValue: function(val) {
-            var modelValue = null, parsedArr = [];
-            return (function(){
-                if(val.indexOf('.')+1) {
-                    var valueArr = val.split('.');
-                    if(valueArr.length>1) {
-                        valueArr.forEach(function(value) {
-                            if(value.indexOf('[')+1) {
-                                var splitedArr = value.split('['),
-                                    arrName = splitedArr[0],
-                                    index = splitedArr[1].split(']')[0].substring(0, splitedArr[1].length - 1);
-                                modelValue = modelValue[arrName][index];
-                            } else
-                                modelValue = modelValue&&modelValue[value] || this.model.get(value);
-                        }.bind(this));
-                    }
-                } else if(val.indexOf('[')+1) {
-                    var splitedArr = val.split('['),
-                        arrName = splitedArr[0],
-                        index = splitedArr[1].split(']')[0].substring(0, splitedArr[1].length - 1);
-                    modelValue = this.model.get(arrName)[index];
+        getParsedModelValue: function (val) {
+            var prevModelValue, modelValue,
+                parse = function(key) {
+                var objectPriority = key.indexOf('[')!=-1? key.indexOf('.')<key.indexOf('[') : true;
+                if(objectPriority) {
+                    var chainKey = key.split('.');
+                    console.log(chainKey);
+                    chainKey.forEach(function(arrVal){
+                        prevModelValue = modelValue;
+                        modelValue = modelValue&&modelValue[arrVal] || this.model.get(arrVal);
+                        if(typeof modelValue === "undefined"&&typeof prevModelValue !="undefined") {
+                            parse(arrVal);
+                        }
+                    }.bind(this));
                 } else {
-                   modelValue = this.model.get(val);
+                    console.log(false);
                 }
                 return modelValue;
-            }.call(this));
+            }.bind(this);
+            return parse(val);
         },
-
+        /**
+         *
+         * @param val - {String}
+         * @returns {*}
+         */
+        //getParsedModelValue: function(val) {
+        //    var modelValue;
+        //    if(val.indexOf('.')+1) {
+        //        var valueArr = val.split('.');
+        //        if(valueArr.length>1) {
+        //            valueArr.forEach(function(value) {
+        //                if(value.indexOf('[')+1) {
+        //                    var splitedArr = value.split('['),
+        //                        arrName = splitedArr[0],
+        //                        index = splitedArr[1].split(']')[0].substring(0, splitedArr[1].length - 1);
+        //                    modelValue = modelValue[arrName][index];
+        //                } else
+        //                    modelValue = modelValue&&modelValue[value] || this.model.get(value);
+        //            }.bind(this));
+        //        }
+        //    } else if(val.indexOf('[')+1) {
+        //        var splitedArr = val.split('['),
+        //            arrName = splitedArr[0],
+        //            index = splitedArr[1].split(']')[0].substring(0, splitedArr[1].length - 1);
+        //        modelValue = this.model.get(arrName)[index];
+        //    } else {
+        //       modelValue = this.model.get(val);
+        //    }
+        //    return modelValue;
+        //},
         /**
          *
          * @param template - {String}
@@ -453,6 +477,18 @@
             var source = this.template.innerHTML;
             if (this.model) {
                 var templateKeys = [],
+                    escapes = {
+                        "'": "'",
+                        '\[': '[',
+                        '\]': ']',
+                        '\\': '\\',
+                        '\r': 'r',
+                        '\n': 'n',
+                        '\t': 't',
+                        '\u2028': 'u2028',
+                        '\u2029': 'u2029'
+                    },
+                    escapePattern = /\\|\[|\]|'|\r|\n|\t|\u2028|\u2029/g,
                     trimedSource = source.replace(/\s+/g, ''),
                     splited = trimedSource.match(/{{(.*)}}/g)[0].split('{{');
                 splited.shift();
@@ -460,9 +496,11 @@
                     var key = val.split('}}')[0];
                     templateKeys.push(key);
                 });
-                Helpers.uniqueArray(templateKeys).forEach(function(val) {
-                    var key = (val.indexOf('[')+1)&&val.replace('[', '\\[') || val;
-                    source = source.replace(new RegExp('{{'+key+'}}',"g"), this.getParsedModelValue(val));
+                Helpers.uniqueArray(templateKeys).forEach(function (val) {
+                    var key = val.replace(escapePattern, function (match) {
+                        return '\\' + escapes[match]
+                    });
+                    source = source.replace(new RegExp('{{' + key + '}}', "g"), this.getParsedModelValue(val));
                 }.bind(this));
             }
             this.el.innerHTML = source;
