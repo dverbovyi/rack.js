@@ -197,8 +197,9 @@
         this.prevAttributes = {};
         this.changed = true;
         this.listenersObj = {};
-        var defaults = this.__proto__.defaults || {};
-        this.set(defaults);
+//        var defaults = this.__proto__.defaults || {};
+        var defaults = this.defaults;
+        if(defaults) this.set(defaults);
         this.set(this.attributes);
         this.initialize.apply(this, arguments);
     };
@@ -419,55 +420,40 @@
          */
         getParsedModelValue: function (val) {
             var prevModelValue, modelValue,
-                parse = function(key) {
-                var objectPriority = key.indexOf('[')!=-1? key.indexOf('.')<key.indexOf('[') : true;
-                if(objectPriority) {
-                    var chainKey = key.split('.');
-                    console.log(chainKey);
-                    chainKey.forEach(function(arrVal){
-                        prevModelValue = modelValue;
-                        modelValue = modelValue&&modelValue[arrVal] || this.model.get(arrVal);
-                        if(typeof modelValue === "undefined"&&typeof prevModelValue !="undefined") {
-                            parse(arrVal);
-                        }
-                    }.bind(this));
-                } else {
-                    console.log(false);
-                }
-                return modelValue;
-            }.bind(this);
-            return parse(val);
+                parser = function(key) {
+                    var isObjectPriority = key.indexOf('[')!=-1? key.indexOf('.')!=-1? key.indexOf('.')<key.indexOf('[') : !key.indexOf('['): true;
+                    if(isObjectPriority) {
+                        var chainKey = key.split('.');
+                        chainKey.forEach(function(arrVal){
+                            prevModelValue = modelValue;
+                            modelValue = modelValue&&modelValue[arrVal] || this.model.get(arrVal);
+                            if(typeof modelValue === "undefined"&&typeof prevModelValue !="undefined") {
+                                parser(arrVal);
+                            }
+                        }.bind(this));
+                    } else {
+                        var splitedStr = key.split('['),
+                            arrName = splitedStr[0];
+                        splitedStr.shift();
+                        var indexArr = splitedStr.map(function(v){
+                            return {
+                                index:+v.split(']')[0],
+                                property: v.indexOf('.')+1? v.split(']')[1].substr(1) : null
+                            }
+                        });
+                        prevModelValue = prevModelValue&&prevModelValue[arrName] || this.model.get(arrName);
+                        indexArr.forEach(function(v){
+                            modelValue = modelValue&&modelValue[v.index] || prevModelValue[v.index];
+                            if(v.property){
+                                parser(v.property);
+                            }
+                        });
+                    }
+                    return modelValue;
+                }.bind(this);
+            return parser(val);
         },
-        /**
-         *
-         * @param val - {String}
-         * @returns {*}
-         */
-        //getParsedModelValue: function(val) {
-        //    var modelValue;
-        //    if(val.indexOf('.')+1) {
-        //        var valueArr = val.split('.');
-        //        if(valueArr.length>1) {
-        //            valueArr.forEach(function(value) {
-        //                if(value.indexOf('[')+1) {
-        //                    var splitedArr = value.split('['),
-        //                        arrName = splitedArr[0],
-        //                        index = splitedArr[1].split(']')[0].substring(0, splitedArr[1].length - 1);
-        //                    modelValue = modelValue[arrName][index];
-        //                } else
-        //                    modelValue = modelValue&&modelValue[value] || this.model.get(value);
-        //            }.bind(this));
-        //        }
-        //    } else if(val.indexOf('[')+1) {
-        //        var splitedArr = val.split('['),
-        //            arrName = splitedArr[0],
-        //            index = splitedArr[1].split(']')[0].substring(0, splitedArr[1].length - 1);
-        //        modelValue = this.model.get(arrName)[index];
-        //    } else {
-        //       modelValue = this.model.get(val);
-        //    }
-        //    return modelValue;
-        //},
+
         /**
          *
          * @param template - {String}
