@@ -385,7 +385,8 @@
         setAttributes: function () {
             if (Object.keys(this.attributes).length)
                 for (var key in this.attributes) {
-                    this[key] = this.attributes[key];
+                    if(this.attributes.hasOwnProperty(key))
+                        this[key] = this.attributes[key];
                 }
         },
         undelegateEvents: function () {
@@ -399,8 +400,7 @@
             this.undelegateEvents();
             this.container.removeChild(this.el);
             this.el = null;
-            if (this.template)
-                this.templateContainer.removeChild(this.template);
+            this.template&&this.templateContainer.removeChild(this.template);
             return this;
         },
         delegateEvents: function () {
@@ -438,15 +438,13 @@
                         var indexArr = splitedStr.map(function(v){
                             return {
                                 index:+v.split(']')[0],
-                                property: v.indexOf('.')+1? v.split(']')[1].substr(1) : null
+                                prop: v.indexOf('.')+1? v.split(']')[1].substr(1) : false
                             }
                         });
                         prevModelValue = prevModelValue&&prevModelValue[arrName] || this.model.get(arrName);
                         indexArr.forEach(function(v){
                             modelValue = modelValue&&modelValue[v.index] || prevModelValue[v.index];
-                            if(v.property){
-                                parser(v.property);
-                            }
+                            v.prop&&parser(v.prop);
                         });
                     }
                     return modelValue;
