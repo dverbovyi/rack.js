@@ -199,7 +199,7 @@
         this.listenersObj = {};
 //        var defaults = this.__proto__.defaults || {};
         var defaults = this.defaults;
-        if(defaults) this.set(defaults);
+        if (defaults) this.set(defaults);
         this.set(this.attributes);
         this.initialize.apply(this, arguments);
     };
@@ -247,7 +247,7 @@
                 prop.forEach(function (val) {
                     if (this.attributes[val]) {
                         this.unwatch(val);
-                        delete this.attributes[val];
+                        this.attributes[val] = null;
                     }
                 }.bind(this));
             } else if (propType === 'Object') {
@@ -255,7 +255,7 @@
             } else {
                 if (this.attributes[prop]) {
                     this.unwatch(prop);
-                    delete this.attributes[prop];
+                    this.attributes[prop] = null;
                 }
             }
 
@@ -290,13 +290,13 @@
             if (propType === 'Array') {
                 prop.forEach(function (val) {
                     if (this.listenersObj[val])
-                        delete this.listenersObj[val];
+                        this.listenersObj[val] = null;
                 }.bind(this));
             } else if (propType === 'Object') {
                 throw new Error('Incorrect input parameters');
             } else {
                 if (this.listenersObj[prop]) {
-                    delete this.listenersObj[prop];
+                    this.listenersObj[prop] = null;
                 }
             }
         },
@@ -370,11 +370,13 @@
         this.attributes = attributes || {};
         this.eventsMap = [];
         this.setAttributes();
+        this.initHelpers();
         this.initialize.apply(this, arguments);
     };
 
     Helpers.extend(View, {
         model: null,
+        helpers: {},
         templateId: '',
         templatePath: '',
         container: document.body,
@@ -385,7 +387,7 @@
         setAttributes: function () {
             if (Object.keys(this.attributes).length)
                 for (var key in this.attributes) {
-                    if(this.attributes.hasOwnProperty(key))
+                    if (this.attributes.hasOwnProperty(key))
                         this[key] = this.attributes[key];
                 }
         },
@@ -400,7 +402,7 @@
             this.undelegateEvents();
             this.container.removeChild(this.el);
             this.el = null;
-            this.template&&this.templateContainer.removeChild(this.template);
+            this.template && this.templateContainer.removeChild(this.template);
             return this;
         },
         delegateEvents: function () {
@@ -409,6 +411,26 @@
                 val.el.addEventListener(val.type, val.handler, false);
             });
         },
+        initHelpers: function () {},
+        /**
+         *
+         * @param {String} name
+         * @param {Function} replacer
+         */
+        registerHelper: function (name, replacer) {
+            if (!Helpers.getType(name) == 'String' && Helpers.getType(replacer) == 'Function')
+                throw new Error('Invalid arguments type');
+            this.helpers[name] = replacer.call(this);
+        },
+
+        /**
+         *
+         * @param {String} name
+         */
+        unregisterHelper: function (name) {
+            this.helpers[name] = null;
+        },
+
         initialize: function () {
             this.render();
         },
@@ -420,14 +442,14 @@
          */
         getParsedModelValue: function (val) {
             var prevModelValue, modelValue,
-                parser = function(key) {
-                    var isObjectPriority = key.indexOf('[')!=-1? key.indexOf('.')!=-1? key.indexOf('.')<key.indexOf('[') : !key.indexOf('['): true;
-                    if(isObjectPriority) {
+                parser = function (key) {
+                    var isObjectPriority = key.indexOf('[') != -1 ? key.indexOf('.') != -1 ? key.indexOf('.') < key.indexOf('[') : !key.indexOf('[') : true;
+                    if (isObjectPriority) {
                         var chainKey = key.split('.');
-                        chainKey.forEach(function(arrVal){
+                        chainKey.forEach(function (arrVal) {
                             prevModelValue = modelValue;
-                            modelValue = modelValue&&modelValue[arrVal] || this.model.get(arrVal);
-                            if(typeof modelValue === "undefined"&&typeof prevModelValue !="undefined") {
+                            modelValue = modelValue && modelValue[arrVal] || this.helpers[arrVal] || this.model.get(arrVal);
+                            if (typeof modelValue === "undefined" && typeof prevModelValue != "undefined") {
                                 parser(arrVal);
                             }
                         }.bind(this));
@@ -435,16 +457,16 @@
                         var splitedStr = key.split('['),
                             arrName = splitedStr[0];
                         splitedStr.shift();
-                        var indexArr = splitedStr.map(function(v){
+                        var indexArr = splitedStr.map(function (v) {
                             return {
-                                index:+v.split(']')[0],
-                                prop: v.indexOf('.')+1? v.split(']')[1].substr(1) : false
+                                index: +v.split(']')[0],
+                                prop: v.indexOf('.') + 1 ? v.split(']')[1].substr(1) : false
                             }
                         });
-                        prevModelValue = prevModelValue&&prevModelValue[arrName] || this.model.get(arrName);
-                        indexArr.forEach(function(v){
-                            modelValue = modelValue&&modelValue[v.index] || prevModelValue[v.index];
-                            v.prop&&parser(v.prop);
+                        prevModelValue = prevModelValue && prevModelValue[arrName] || this.helpers[arrName] || this.model.get(arrName);
+                        indexArr.forEach(function (v) {
+                            modelValue = modelValue && modelValue[v.index] || prevModelValue[v.index];
+                            v.prop && parser(v.prop);
                         });
                     }
                     return modelValue;
@@ -459,7 +481,7 @@
         parseTemplate: function (template) {
             this.template = template;
             var source = this.template.innerHTML;
-            if (this.model) {
+            if (this.model || Object.keys(this.helpers).length) {
                 var templateKeys = [],
                     escapes = {
                         "'": "'",
@@ -468,9 +490,7 @@
                         '\\': '\\',
                         '\r': 'r',
                         '\n': 'n',
-                        '\t': 't',
-                        '\u2028': 'u2028',
-                        '\u2029': 'u2029'
+                        '\t': 't'
                     },
                     escapePattern = /\\|\[|\]|'|\r|\n|\t|\u2028|\u2029/g,
                     trimedSource = source.replace(/\s+/g, ''),
@@ -500,8 +520,8 @@
                 return el;
             })();
             this.el = document.createElement(this.tagName);
-            if (this.id) this.el.setAttribute('id', this.id);
-            if (this.className) this.el.setAttribute('class', this.className);
+            this.id && this.el.setAttribute('id', this.id);
+            this.className && this.el.setAttribute('class', this.className);
             var template = document.getElementById(this.templateId);
             if (template)
                 this.parseTemplate(template);
