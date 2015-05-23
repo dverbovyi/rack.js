@@ -197,7 +197,6 @@
         this.prevAttributes = {};
         this.changed = true;
         this.listenersObj = {};
-//        var defaults = this.__proto__.defaults || {};
         var defaults = this.defaults;
         if (defaults) this.set(defaults);
         this.set(this.attributes);
@@ -209,8 +208,7 @@
          * virtual @method initialize
          * initialization logic
          */
-        initialize: function () {
-        },
+        initialize: function () {},
         /**
          * @method set - set property as model attributes
          *
@@ -377,19 +375,24 @@
     Helpers.extend(View, {
         model: null,
         helpers: {},
-        templateId: '',
-        templatePath: '',
+        tmpId: '',
+        tmpPath: '',
         container: document.body,
         tagName: 'div',
         id: '',
         className: '',
         events: {},
-        setAttributes: function () {
+        /**
+         *
+         * @param {Boolean} unset
+         */
+        setAttributes: function (unset) {
             if (Object.keys(this.attributes).length)
                 for (var key in this.attributes) {
                     if (this.attributes.hasOwnProperty(key))
-                        this[key] = this.attributes[key];
+                        this[key] = unset? null : this.attributes[key];
                 }
+                if(unset) this.attributes = {};
         },
         undelegateEvents: function () {
             if (!this.eventsMap.length) return;
@@ -399,10 +402,12 @@
             this.eventsMap = [];
         },
         remove: function () {
+            this.setAttributes(true);
             this.undelegateEvents();
             this.container.removeChild(this.el);
             this.el = null;
             this.template && this.templateContainer.removeChild(this.template);
+            this.helpers = {};
             return this;
         },
         delegateEvents: function () {
@@ -418,7 +423,7 @@
          * @param {Function} replacer
          */
         registerHelper: function (name, replacer) {
-            if (!Helpers.getType(name) == 'String' && Helpers.getType(replacer) == 'Function')
+            if (!(Helpers.getType(name) == 'String' && Helpers.getType(replacer) == 'Function'))
                 throw new Error('Invalid arguments type');
             this.helpers[name] = replacer.call(this);
         },
@@ -437,7 +442,7 @@
 
         /**
          *
-         * @param val - {String}
+         * @param {String} val
          * @returns {*}
          */
         getParsedModelValue: function (val) {
@@ -522,22 +527,22 @@
             this.el = document.createElement(this.tagName);
             this.id && this.el.setAttribute('id', this.id);
             this.className && this.el.setAttribute('class', this.className);
-            var template = document.getElementById(this.templateId);
+            var template = document.getElementById(this.tmpId);
             if (template)
                 this.parseTemplate(template);
-            else if (this.templatePath)
-                Service.get(this.templatePath, true).then(function (response) {
+            else if (this.tmpPath)
+                Service.get(this.tmpPath, true).then(function (response) {
                     this.templateContainer.insertAdjacentHTML("beforeEnd", response);
-                    template = document.getElementById(this.templateId);
+                    template = document.getElementById(this.tmpId);
                     if (template)
                         this.parseTemplate(template);
                     else
-                        throw new Error('Template with id "' + this.templateId + '" doesn\'t exist');
+                        throw new Error('Template with id "' + this.tmpId + '" doesn\'t exist');
                 }.bind(this), function (xhr) {
                     throw new Error(xhr.responseURL + ' ' + xhr.statusText);
                 });
             else
-                throw new Error('Template with id "' + this.templateId + '" doesn\'t exist');
+                throw new Error('Template with id "' + this.tmpId + '" doesn\'t exist');
             this.container.appendChild(this.el);
         },
         setupViewEvents: function () {

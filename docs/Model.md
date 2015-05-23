@@ -116,6 +116,6 @@ If you want to unbind all handlers from several properties you should pass the f
 
 model.toJSON
 
-export model attribute in JSON-format
+export model attribute to JSON format
 
     var jsonModel = myModel.toJSON();
