@@ -129,6 +129,33 @@
         }
         return a;
     };
+
+    /**
+     *
+     * @param {Function} callback
+     * @param {Object} context
+     */
+    Helpers.defer = function(callback, context){
+        setTimeout(callback.bind(context), 0);
+    };
+
+    /**
+     *
+     * @param {String} selector
+     * return DOM element
+     */
+    Helpers.getEl = function(selector){
+        var type = selector[0], el;
+        if(selector.indexOf(' ')+1)
+            el = document.querySelectorAll(selector);
+        else if(type=='#')
+            el = document.getElementById(selector.substring(1, selector.length));
+        else if(type=='.')
+            el = document.getElementsByClassName(selector.substring(1, selector.length));
+        else
+            el = document.getElementsByTagName(selector);
+        return el;
+    };
     //-------------------------
 
     // Rack.Service
@@ -377,7 +404,7 @@
         helpers: {},
         tmpId: '',
         tmpPath: '',
-        container: document.body,
+        container: 'body',
         tagName: 'div',
         id: '',
         className: '',
@@ -401,13 +428,18 @@
             });
             this.eventsMap = [];
         },
+        getContainerEl: function(){
+            if(!this.parentEl) {
+                var parentEl = Helpers.getEl(this.container);
+                this.parentEl = Helpers.getType(Array.prototype.slice.call(parentEl)) === 'Array'? parentEl[0] : parentEl;
+            }
+            return this.parentEl;
+        },
         remove: function () {
-            this.setAttributes(true);
             this.undelegateEvents();
-            this.container.removeChild(this.el);
+            this.getContainerEl().removeChild(this.el);
             this.el = null;
             this.template && this.templateContainer.removeChild(this.template);
-            this.helpers = {};
             return this;
         },
         delegateEvents: function () {
@@ -515,9 +547,15 @@
             this.el.innerHTML = source;
             this.setupViewEvents();
         },
+        beforeRender: function(e){},
+        afterRender: function(e){},
         render: function () {
+            document.addEventListener('beforeRender', this.beforeRender.bind(this), false);
+            document.addEventListener('afterRender', this.afterRender.bind(this), false);
+            document.dispatchEvent(new CustomEvent('beforeRender'));
             if (this.el)
                 this.remove();
+
             this.templateContainer = document.getElementById('templates') || (function () {
                 var el = document.createElement('div');
                 el.setAttribute('id', 'templates');
@@ -543,7 +581,10 @@
                 });
             else
                 throw new Error('Template with id "' + this.tmpId + '" doesn\'t exist');
-            this.container.appendChild(this.el);
+            this.getContainerEl().appendChild(this.el);
+            Helpers.defer(function(){
+                document.dispatchEvent(new CustomEvent('afterRender'));
+            }, this);
         },
         setupViewEvents: function () {
             var events = this.events;
