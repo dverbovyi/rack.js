@@ -9,30 +9,27 @@ extend correctly sets up the prototype chain, so subclasses created with the bel
 can be further extended and subclassed as far as you like.
 Example:
 
- ```javascript
+ ```
     var MyView = Rack.View.extend({
-       tmpId: 'testTemplate', //template Id
-       tmpPath: './testTemplate.html', //template path - unnecessary if template already exist in your index.html
+       tmpId: 'testTemplate', // template Id
+       tmpPath: './testTemplate.html', // template path - unnecessary if template already exist in your index.html
        tagName: 'ul', // tagName of your view element
        id: 'some_id', // id attribute of your view element
        container: '#parent', // parent element for pushing your view
-       className: 'some_class', //class attribute of your view element
+       className: 'some_class', // class attribute of your view element
        events:{
            'click li':'handler'
        },
        handler: function(){...}
     });
-
-    var MyModel = Rack.Model.extend({...});
-    var myView = new MyView({model: new MyModel()});
-```
+ ```
 
  * Brief aside on super: JavaScript does not provide a simple way to call super — the function of the same name defined
  higher on the prototype chain. If you override a core function like set (get, unset, watch, unwatch, trigger),
  and you want to invoke the parent object's implementation, you'll have to explicitly call it, along these lines:
 Example:
 
-    ```javascript
+    ```
     var MyView = Rack.View.extend({
         ...
         initialize: function(){
@@ -42,3 +39,15 @@ Example:
         ...
     });
     ```
+
+### 2. constructor/initialize
+
+    new View([attributes])
+
+When creating an instance of a view, you can pass in the initial values of the attributes, which will be available in the view.
+If you want bind your model to view you should pass the model instance to your view constructor as object with key "model",
+See example:
+
+ ```
+    var myView = new MyView({model: new Model()});
+ ```

@@ -9,36 +9,43 @@ extend correctly sets up the prototype chain, so subclasses created with the bel
 can be further extended and subclassed as far as you like.
 Example:
 
- ```javascript
+ ```
     var MyModel = Rack.Model.extend({
         getBookInfo: function() {
             return this.get('title') + ' - ' + this.get('author');
         }
     });
+ ```
 
+ * Brief aside on super: JavaScript does not provide a simple way to call super — the function of the same name defined
+  higher on the prototype chain. If you override a core function like set (get, unset, watch, unwatch, trigger),
+  and you want to invoke the parent object's implementation, you'll have to explicitly call it, along these lines:
+ Example:
+
+     ```
+     var MyModel = Rack.Model.extend({
+         set: function(attributes) {
+            MyModel.__super__.set.apply(this, arguments);
+             ...
+         }
+     });
+     ```
+
+### 2. constructor/initialize
+
+    new Model([attributes])
+
+When creating an instance of a model, you can pass in the initial values of the attributes, which will be set on the model.
+If you define an initialize function, it will be invoked when the model is created.
+
+ ```
     var myModel = new MyModel({
         title: 'Code Complete',
         author: 'Steve McConnell'
     });
-    
-    alert(myModel.getBookInfo());
-```
+ ```
 
- * Brief aside on super: JavaScript does not provide a simple way to call super — the function of the same name defined
- higher on the prototype chain. If you override a core function like set (get, unset, watch, unwatch, trigger),
- and you want to invoke the parent object's implementation, you'll have to explicitly call it, along these lines:
-Example:
-
-    ```javascript
-    var MyModel = Rack.Model.extend({
-        set: function(attributes) {
-           MyModel.__super__.set.apply(this, arguments);
-            ...
-        }
-    });
-    ```
-
-### 2. get
+### 3. get
 
 model.get(attribute)
 
