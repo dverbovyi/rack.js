@@ -428,7 +428,7 @@
             });
             this.eventsMap = [];
         },
-        getContainerEl: function(){
+        getparentEl: function(){
             if(!this.parentEl) {
                 var parentEl = Helpers.getEl(this.container);
                 this.parentEl = Helpers.getType(Array.prototype.slice.call(parentEl)) === 'Array'? parentEl[0] : parentEl;
@@ -437,7 +437,7 @@
         },
         remove: function () {
             this.undelegateEvents();
-            this.getContainerEl().removeChild(this.el);
+            this.getparentEl().removeChild(this.el);
             this.el = null;
             this.template && this.templateContainer.removeChild(this.template);
             return this;
@@ -550,18 +550,28 @@
         beforeRender: function(e){},
         afterRender: function(e){},
         render: function () {
+            console.log(this);
             document.addEventListener('beforeRender', this.beforeRender.bind(this), false);
             document.addEventListener('afterRender', this.afterRender.bind(this), false);
             document.dispatchEvent(new CustomEvent('beforeRender'));
             if (this.el)
                 this.remove();
 
-            this.templateContainer = document.getElementById('templates') || (function () {
-                var el = document.createElement('div');
-                el.setAttribute('id', 'templates');
-                document.body.appendChild(el);
-                return el;
-            })();
+            if(!this.templateContainer) {
+                this.templateContainer = (function () {
+                    var el = document.createElement('div');
+                    el.setAttribute('id', 'templates');
+                    document.body.appendChild(el);
+                    return el;
+                }());
+            }
+//            this.templateContainer = Helpers.getEl('#templates') || (function () {
+//                alert(false);
+//                var el = document.createElement('div');
+//                el.setAttribute('id', 'templates');
+//                document.body.appendChild(el);
+//                return el;
+//            })();
             this.el = document.createElement(this.tagName);
             this.id && this.el.setAttribute('id', this.id);
             this.className && this.el.setAttribute('class', this.className);
@@ -581,7 +591,7 @@
                 });
             else
                 throw new Error('Template with id "' + this.tmpId + '" doesn\'t exist');
-            this.getContainerEl().appendChild(this.el);
+            this.getparentEl().appendChild(this.el);
             Helpers.defer(function(){
                 document.dispatchEvent(new CustomEvent('afterRender'));
             }, this);

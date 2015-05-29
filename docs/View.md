@@ -20,7 +20,10 @@ Example:
        events:{
            'click li':'handler'
        },
-       handler: function(){...}
+       handler: function(){...},
+       beforeRender: function(){
+            this.model.watch('model', this.render, this);
+       }
     });
  ```
 
@@ -44,10 +47,30 @@ Example:
 
     new View([attributes])
 
-When creating an instance of a view, you can pass in the initial values of the attributes, which will be available in the view.
-If you want bind your model to view you should pass the model instance to your view constructor as object with key "model",
+When creating an instance of a view, you can pass in the initial values of the attributes, which will be available in
+the view. If you want bind your model to view you should pass the model instance to your view constructor as object
+with key "model",
 See example:
 
  ```
     var myView = new MyView({model: new Model()});
+ ```
+
+ ### 3. el
+
+ view.el
+
+ All views have a DOM element at all times (the el property), whether they've already been inserted into the page
+ or not. In this fashion, views can be rendered at any time, and inserted into the DOM all at once, in order to get
+ high-performance UI rendering with as few reflows and repaints as possible.
+
+ this.el will be created from the view's tagName, className, id and attributes properties. If none are set,
+ this.el is an empty div, which is often just fine.
+
+ ```
+ var ItemView = Rack.View.extend({
+   tagName:'span',
+   id: 'my_view',
+   className:'my_view',
+ });
  ```

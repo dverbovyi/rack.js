@@ -53,7 +53,7 @@ Get the current value of an attribute from the model. For example:
 
     myModel.get("title")
 
-### 3. set
+### 4. set
 
 model.set(attributes)
 
@@ -66,7 +66,7 @@ or
 
     myModel.set("title", "A Scandal in Bohemia");
 
-### 4. unset
+### 5. unset
 
 model.unset(attribute)
 
@@ -74,7 +74,7 @@ Remove an attribute by deleting it from the internal attributes.
 
     myModel.unset("title")
 
-### 5. clear
+### 6. clear
 
 model.clear()
 
@@ -82,7 +82,7 @@ Removes all attributes from the model.
 
     myModel.clear()
 
-### 6. watch
+### 7. watch
 
 model.watch(attribute, callback)
 
@@ -106,7 +106,7 @@ If you want to watch for changing all model, you should mention a 'model' key-wo
         console.log('Model has changed!');
     });
 
-### 7. unwatch
+### 8. unwatch
 
 model.unwatch(attribute)
 
@@ -119,7 +119,7 @@ If you want to unbind all handlers from several properties you should pass the f
     myModel.unwatch(['title', 'content'])
 
 
-### 8. toJSON
+### 9. toJSON
 
 model.toJSON
 
