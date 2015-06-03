@@ -20,10 +20,12 @@ Example:
        events:{
            'click li':'handler'
        },
+       initialize: function(){
+          this.model.watch('model', this.render, this);
+       },
        handler: function(){...},
-       beforeRender: function(){
-            this.model.watch('model', this.render, this);
-       }
+       beforeRender: function(){...}, // will be called before template render
+       afterRender: function(){...} // will be called after template render
     });
  ```
 
@@ -52,9 +54,9 @@ the view. If you want bind your model to view you should pass the model instance
 with key "model",
 See example:
 
- ```
-    var myView = new MyView({model: new Model()});
- ```
+     ```
+        var myView = new MyView({model: new Model()});
+     ```
 
  ### 3. el
 
@@ -67,10 +69,10 @@ See example:
  this.el will be created from the view's tagName, className, id and attributes properties. If none are set,
  this.el is an empty div, which is often just fine.
 
- ```
- var ItemView = Rack.View.extend({
-   tagName:'span',
-   id: 'my_view',
-   className:'my_view',
- });
- ```
+     ```
+     var MyView = Rack.View.extend({
+       tagName:'span',
+       id: 'my_view',
+       className:'my_view',
+     });
+     ```

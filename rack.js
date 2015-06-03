@@ -232,7 +232,7 @@
 
     Helpers.extend(Model, {
         /**
-         * virtual @method initialize
+         * abstract @method initialize
          * initialization logic
          */
         initialize: function () {},
@@ -397,6 +397,7 @@
         this.setAttributes();
         this.initHelpers();
         this.initialize.apply(this, arguments);
+        this.render();
     };
 
     Helpers.extend(View, {
@@ -436,7 +437,9 @@
             return this.parentEl;
         },
         remove: function () {
+            this.setAttributes(true);
             this.undelegateEvents();
+            this.removeEventListeners();
             this.getparentEl().removeChild(this.el);
             this.el = null;
             this.template && this.templateContainer.removeChild(this.template);
@@ -448,16 +451,21 @@
                 val.el.addEventListener(val.type, val.handler, false);
             });
         },
+        /**
+         * abstract @method initHelpers
+         * setup template helpers
+         */
         initHelpers: function () {},
         /**
          *
          * @param {String} name
          * @param {Function} replacer
+         * @param {Object} context
          */
-        registerHelper: function (name, replacer) {
+        registerHelper: function (name, replacer, context) {
             if (!(Helpers.getType(name) == 'String' && Helpers.getType(replacer) == 'Function'))
                 throw new Error('Invalid arguments type');
-            this.helpers[name] = replacer.call(this);
+            this.helpers[name] = replacer.call(context || this);
         },
 
         /**
@@ -468,9 +476,11 @@
             this.helpers[name] = null;
         },
 
-        initialize: function () {
-            this.render();
-        },
+        /**
+         * abstract @method initialize
+         * initialization logic
+         */
+        initialize: function () {},
 
         /**
          *
@@ -510,13 +520,7 @@
                 }.bind(this);
             return parser(val);
         },
-
-        /**
-         *
-         * @param template - {String}
-         */
-        parseTemplate: function (template) {
-            this.template = template;
+        parseTemplate: function () {
             var source = this.template.innerHTML;
             if (this.model || Object.keys(this.helpers).length) {
                 var templateKeys = [],
@@ -549,54 +553,52 @@
         },
         beforeRender: function(e){},
         afterRender: function(e){},
+        addEventListeners: function(){
+            this.el.addEventListener('beforeRender', this.beforeRender.bind(this), false);
+            this.el.addEventListener('afterRender', this.afterRender.bind(this), false);
+        },
+        removeEventListeners: function() {
+            this.el.removeEventListener('beforeRender', this.beforeRender.bind(this), false);
+            this.el.removeEventListener('afterRender', this.afterRender.bind(this), false);
+        },
         render: function () {
-            console.log(this);
-            document.addEventListener('beforeRender', this.beforeRender.bind(this), false);
-            document.addEventListener('afterRender', this.afterRender.bind(this), false);
-            document.dispatchEvent(new CustomEvent('beforeRender'));
-            if (this.el)
-                this.remove();
-
             if(!this.templateContainer) {
-                this.templateContainer = (function () {
+                this.templateContainer = Helpers.getEl('#templates') || (function () {
                     var el = document.createElement('div');
                     el.setAttribute('id', 'templates');
                     document.body.appendChild(el);
                     return el;
                 }());
             }
-//            this.templateContainer = Helpers.getEl('#templates') || (function () {
-//                alert(false);
-//                var el = document.createElement('div');
-//                el.setAttribute('id', 'templates');
-//                document.body.appendChild(el);
-//                return el;
-//            })();
-            this.el = document.createElement(this.tagName);
-            this.id && this.el.setAttribute('id', this.id);
-            this.className && this.el.setAttribute('class', this.className);
-            var template = document.getElementById(this.tmpId);
-            if (template)
-                this.parseTemplate(template);
+            if(!this.el) {
+                this.el = document.createElement(this.tagName);
+                this.addEventListeners();
+                this.id && this.el.setAttribute('id', this.id);
+                this.className && this.el.setAttribute('class', this.className);
+            }
+            this.el.dispatchEvent(new CustomEvent('beforeRender'));
+            if(!this.template)
+                this.template = Helpers.getEl('#'+this.tmpId);
+            if (this.template)
+                this.parseTemplate();
             else if (this.tmpPath)
                 Service.get(this.tmpPath, true).then(function (response) {
                     this.templateContainer.insertAdjacentHTML("beforeEnd", response);
-                    template = document.getElementById(this.tmpId);
-                    if (template)
-                        this.parseTemplate(template);
+                    this.template = document.getElementById(this.tmpId);
+                    if (this.template)
+                        this.parseTemplate();
                     else
                         throw new Error('Template with id "' + this.tmpId + '" doesn\'t exist');
                 }.bind(this), function (xhr) {
                     throw new Error(xhr.responseURL + ' ' + xhr.statusText);
                 });
-            else
-                throw new Error('Template with id "' + this.tmpId + '" doesn\'t exist');
             this.getparentEl().appendChild(this.el);
             Helpers.defer(function(){
-                document.dispatchEvent(new CustomEvent('afterRender'));
+                this.el.dispatchEvent(new CustomEvent('afterRender'));
             }, this);
         },
         setupViewEvents: function () {
+            this.undelegateEvents();
             var events = this.events;
             if (!events) return;
             for (var key in events) {
