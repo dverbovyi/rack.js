@@ -54,8 +54,8 @@ If you define an initialize function, it will be invoked when the model is creat
 Get the current value of an attribute from the model. For example:
    
  ```javascript
-        myModel.get("title")
-    ```
+        myModel.get("title");
+```
 
 ### 4. set
 
