@@ -4,7 +4,7 @@
 
     Rack.View.extend(properties)
 
-To create a View class of your own, you extend Rack.View and provide instance properties,
+To create a View class of your own, you extend ```Rack.View``` and provide instance properties,
 as well options to be attached directly to the constructor function.
 
 extend correctly sets up the prototype chain, so subclasses created with the bellow described way
@@ -32,7 +32,7 @@ Example:
 ```
 
  * Brief aside on super: JavaScript does not provide a simple way to call super — the function of the same name defined
- higher on the prototype chain. If you override a core function like set (get, unset, watch, unwatch, trigger),
+ higher on the prototype chain. If you override a core function like ```set``` (```get```, ```unset```, ```watch```, ```unwatch```, ```trigger```),
  and you want to invoke the parent object's implementation, you'll have to explicitly call it, along these lines:
 Example:
 
@@ -53,7 +53,7 @@ Example:
 
 When creating an instance of a view, you can pass in the initial values of the attributes, which will be available in
 the view. If you want bind your model to view you should pass the model instance to your view constructor as object
-with key "model",
+with key ```model```,
 See example:
 
 ```javascript
@@ -64,12 +64,11 @@ See example:
 
     view.el
 
- All views have a DOM element at all times (the el property), whether they've already been inserted into the page.
+ All views have a DOM element at all times (the ```el``` property), whether they've already been inserted into the page.
  In this fashion, views can be rendered at any time, and inserted into the DOM all at once, in order to get
  high-performance UI rendering with as few reflows and repaints as possible.
 
- this.el will be created from the view's tagName, className, id and attributes properties. If none are set,
- this.el is an empty div, which is often just fine.
+ ```this.el``` will be created from the view's ```tagName```, ```className```, ```id``` and attributes properties. If none are set, ```this.el``` is an empty ```div```, which is often just fine.
 
 ```javascript
         var MyView = Rack.View.extend({
@@ -83,7 +82,7 @@ See example:
 
     view.templateId, view.path
 
-For binding template to your view you should point out templateId and path to this one if it separate file.
+For binding template to your view you should point out ```templateId``` and ```path``` to this one if it separate file.
 
 ```javascript
         var MyView = Rack.View.extend({
@@ -92,7 +91,7 @@ For binding template to your view you should point out templateId and path to th
         });
 ```
 
-View Template example:
+View template example:
 
 ```html
         <script type="text/template" id="testTemplate">
