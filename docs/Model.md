@@ -11,7 +11,7 @@ extend correctly sets up the prototype chain, so subclasses created with the bel
 can be further extended and subclassed as far as you like.
 Example:
 
- ```javascript
+```javascript
         var MyModel = Rack.Model.extend({
             getBookInfo: function() {
                 return this.get('title') + ' - ' + this.get('author');
@@ -24,7 +24,7 @@ Example:
   and you want to invoke the parent object's implementation, you'll have to explicitly call it, along these lines:
  Example:
 
-     ```javascript
+    ```javascript
          var MyModel = Rack.Model.extend({
              set: function(attributes) {
                 MyModel.__super__.set.apply(this, arguments);
@@ -40,7 +40,7 @@ Example:
 When creating an instance of a model, you can pass in the initial values of the attributes, which will be set on the model.
 If you define an initialize function, it will be invoked when the model is created.
     
-    ```javascript
+```javascript
         var myModel = new MyModel({
             title: 'Code Complete',
             author: 'Steve McConnell'
@@ -53,7 +53,7 @@ If you define an initialize function, it will be invoked when the model is creat
 
 Get the current value of an attribute from the model. For example:
    
-    ```javascript
+ ```javascript
         myModel.get("title")
     ```
 
@@ -64,12 +64,12 @@ Get the current value of an attribute from the model. For example:
 Set a hash of attributes (one or many) on the model.
 You may also pass individual keys and values.
 
-   ```javascript
+ ```javascript
         myModel.set({title: "March 20", content: "In his eyes she eclipses..."});
     ```
 or
 
-   ```javascript
+  ```javascript
         myModel.set("title", "A Scandal in Bohemia");
     ```
 
@@ -79,7 +79,7 @@ or
 
 Remove an attribute by deleting it from the internal attributes.
 
-   ```javascript
+  ```javascript
         myModel.unset("title")
     ```
 
@@ -89,7 +89,7 @@ Remove an attribute by deleting it from the internal attributes.
 
 Removes all attributes from the model.
 
-   ```javascript
+ ```javascript
         myModel.clear()
     ```
 
@@ -99,7 +99,7 @@ Removes all attributes from the model.
 
 Initialize handler for change value of watched property. Handler will be triggered if the value of watched property will change.
 
-   ```javascript
+ ```javascript
         myModel.watch('title', function(e) {
             console.log('Changed');
             console.log('New '+e.key+' value is '+e.val);
@@ -109,7 +109,7 @@ Initialize handler for change value of watched property. Handler will be trigger
 If you want that handler was the same for several watched properties,
 you should pass the first arguments as Array, See Example:
 
-   ```javascript
+ ```javascript
         myModel.watch(['title', 'content'], function(e) {
             console.log(e.key+' has changed'); //Callback will be called per every array-item (twice in this case)
         });
@@ -117,7 +117,7 @@ you should pass the first arguments as Array, See Example:
 
 If you want to watch for changing all model, you should mention a 'model' key-word as first argument
 
-   ```javascript
+ ```javascript
         myModel.watch('model', function(e){
             console.log('Model has changed!');
         });
@@ -129,13 +129,13 @@ If you want to watch for changing all model, you should mention a 'model' key-wo
 
 Unbind the handler from watched property(ies)
 
-  ```javascript
+```javascript
         myModel.unwatch('title')
     ```
 
 If you want to unbind all handlers from several properties you should pass the first arguments as Array, See Example:
 
-   ```javascript
+ ```javascript
         myModel.unwatch(['title', 'content'])
     ```
 
@@ -145,6 +145,6 @@ If you want to unbind all handlers from several properties you should pass the f
 
 export model attribute to JSON format
 
-   ```javascript
+ ```javascript
         var jsonModel = myModel.toJSON();
     ```
