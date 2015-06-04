@@ -45,7 +45,7 @@ If you define an initialize function, it will be invoked when the model is creat
             title: 'Code Complete',
             author: 'Steve McConnell'
         });
-    ```
+```
 
 ### 3. get
 
