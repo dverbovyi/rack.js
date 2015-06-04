@@ -11,7 +11,7 @@ extend correctly sets up the prototype chain, so subclasses created with the bel
 can be further extended and subclassed as far as you like.
 Example:
 
-    ```javascript
+```javascript
         var MyView = Rack.View.extend({
            templateId: 'testTemplate', // template Id
            path: './testTemplate.html', // if your template defined as separate file your should set template path
@@ -29,14 +29,14 @@ Example:
            beforeRender: function(){...}, // will be called before template render
            afterRender: function(){...} // will be called after template render
         });
-    ```
+```
 
  * Brief aside on super: JavaScript does not provide a simple way to call super — the function of the same name defined
  higher on the prototype chain. If you override a core function like set (get, unset, watch, unwatch, trigger),
  and you want to invoke the parent object's implementation, you'll have to explicitly call it, along these lines:
 Example:
 
-    ```javascript
+```javascript
         var MyView = Rack.View.extend({
             ...
             render: function(){
@@ -45,7 +45,7 @@ Example:
             }
             ...
         });
-    ```
+```
 
 ### 2. constructor/initialize
 
@@ -56,9 +56,9 @@ the view. If you want bind your model to view you should pass the model instance
 with key "model",
 See example:
 
-    ```javascript
+```javascript
         var myView = new MyView({model: new Model()});
-    ```
+```
 
 ### 3. el
 
@@ -71,13 +71,13 @@ See example:
  this.el will be created from the view's tagName, className, id and attributes properties. If none are set,
  this.el is an empty div, which is often just fine.
 
-    ```javascript
+```javascript
         var MyView = Rack.View.extend({
             tagName:'span',
             id: 'my_view',
             className:'my_view',
         });
-    ```
+```
 
 ### 4. templateId, path
 
@@ -85,19 +85,19 @@ See example:
 
 For binding template to your view you should point out templateId and path to this one if it separate file.
 
-    ```javascript
+```javascript
         var MyView = Rack.View.extend({
             templateId: 'myViewTemplate',
             path: './myViewTemplate.html'
         });
-    ```
+```
 
 View Template example:
 
-    ```html
+```html
         <script type="text/template" id="testTemplate">
             <ul>
                 <li>{{title}} - {{author}}</li>
             </ul>
         </script>
-    ```
+```
