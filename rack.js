@@ -11,7 +11,7 @@
 
     /**
      *
-     * @param protoProps - {Object}
+     * @param {Object } protoProps
      * @returns {Function}
      */
     var extend = function (protoProps) {
@@ -40,8 +40,8 @@
 
     /**
      *
-     * @param Child - {Function}
-     * @param Parent - {Function|Object}
+     * @param {Function} Child
+     * @param {Function|Object} Parent
      */
     Helpers.extend = function (Child, Parent) {
         var type = this.getType(Parent);
@@ -64,7 +64,7 @@
 
     /**
      * @method clone - clone passes object
-     * @param obj - {Object}
+     * @param {Object} obj
      * @return {Object}
      *
      */
@@ -81,9 +81,10 @@
         }
         return temp;
     };
+
     /**
      *
-     * @param object - type {*}
+     * @param {*} object
      * @returns {string}
      */
     Helpers.getType = function (object) {
@@ -113,7 +114,7 @@
 
     /**
      *
-     * @param array - {Array}
+     * @param {Array} array
      * @returns {Array}
      */
     Helpers.uniqueArray = function (array) {
@@ -142,7 +143,7 @@
     /**
      *
      * @param {String} selector
-     * return DOM element
+     * return {Object} DOM element
      */
     Helpers.getEl = function (selector) {
         var type = selector[0], el;
@@ -166,11 +167,12 @@
 
     /**
      *
-     * @param url - {String}
-     * @param data - {*}
-     * @param method - {String}
-     * @param resolve - {Function}
-     * @param reject - {Function}
+     * @param {String} url
+     * @param {*} data
+     * @param {String} method
+     * @param {Function} resolve
+     * @param {Function} reject
+     * @param {Boolean} async
      */
     Service.sendRequest = function (url, data, method, resolve, reject, async) {
         var asyncReq = async || true;
@@ -204,12 +206,25 @@
         xhr.send(data);
     };
 
+    /**
+     *
+     * @param {String} url
+     * @param {Boolean} async
+     * @returns {Promise}
+     */
     Service.get = function (url, async) {
         return new Promise(function (resolve, reject) {
             this.sendRequest(url, null, 'GET', resolve, reject, async);
         }.bind(this));
     };
 
+    /**
+     *
+     * @param {String} url
+     * @param {JSON} data
+     * @param {Boolean} async
+     * @returns {Promise}
+     */
     Service.post = function (url, data, async) {
         return new Promise(function (resolve, reject) {
             this.sendRequest(url, data, 'POST', resolve, reject, async);
@@ -231,17 +246,18 @@
     };
 
     Helpers.extend(Model, {
+
         /**
          * abstract @method initialize
          * initialization logic
          */
-        initialize: function () {
-        },
+        initialize: function () {},
+
         /**
          * @method set - set property as model attributes
          *
-         * @param key - {String|JSON}
-         * @param val - {*}
+         * @param {String|JSON} key
+         * @param {*} val
          */
         set: function (key, val) {
             var keyType = Helpers.getType(key);
@@ -264,7 +280,7 @@
         /**
          * @method unset - delete property(ies) and listeners from model's attributes
          *
-         * @param prop - {String|Array}
+         * @param {String|Array} prop
          *
          */
         unset: function (prop) {
@@ -289,9 +305,10 @@
 
         /**
          * @method watch - initialize handler for watched property
-         * @param prop - {String|Array}
-         * @param callback - {Function}
-         * @param context - {Object}
+         *
+         * @param {String|Array} prop
+         * @param {Function} callback
+         * @param {Object} context
          */
         watch: function (prop, callback, context) {
             var ctx = context || this,
@@ -306,10 +323,11 @@
                 this.listenersObj[prop] = callback.bind(ctx);
             }
         },
+
         /**
          * @method unwatch - delete watching property
-         * @param prop - {String}
          *
+         * @param {String} prop
          */
         unwatch: function (prop) {
             var propType = Helpers.getType(prop);
@@ -330,7 +348,7 @@
         /**
          * @method get - get property's value
          *
-         * @param key - {String}
+         * @param {String} key
          * @returns {*}
          */
         get: function (key) {
@@ -348,8 +366,8 @@
         /**
          * @method trigger - call appropriate handler
          *
-         * @param event - event type, {String}
-         * @param watchKey - {String}
+         * @param {String} event - event type
+         * @param {String} watchKey
          */
         trigger: function (event, watchKey) {
             if (event == 'change') {
@@ -411,6 +429,7 @@
         id: '',
         className: '',
         events: {},
+
         /**
          *
          * @param {Boolean} unset
@@ -437,6 +456,7 @@
             }
             return this.parentEl;
         },
+
         /**
          *
          * @param {Boolean} calledFromRender
@@ -461,11 +481,13 @@
                 val.el.addEventListener(val.type, val.handler, false);
             });
         },
+
         /**
          * abstract @method initHelpers
          * setup template helpers
          */
         initHelpers: function () {},
+
         /**
          *
          * @param {String} name
@@ -562,10 +584,8 @@
             this.el.innerHTML = source;
             this.setupViewEvents();
         },
-        beforeRender: function (e) {
-        },
-        afterRender: function (e) {
-        },
+        beforeRender: function (e) {},
+        afterRender: function (e) {},
         addEventListeners: function () {
             this.el.addEventListener('beforeRender', this.beforeRender.bind(this), false);
             this.el.addEventListener('afterRender', this.afterRender.bind(this), false);
@@ -574,6 +594,7 @@
             this.el.removeEventListener('beforeRender', this.beforeRender.bind(this), false);
             this.el.removeEventListener('afterRender', this.afterRender.bind(this), false);
         },
+
         /**
          *
          * @param {Boolean} hardRerender
