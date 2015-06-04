@@ -17,21 +17,21 @@ Example:
                 return this.get('title') + ' - ' + this.get('author');
             }
         });
- ```
+```
  
  * Brief aside on super: JavaScript does not provide a simple way to call super — the function of the same name defined
   higher on the prototype chain. If you override a core function like set (get, unset, watch, unwatch, trigger),
   and you want to invoke the parent object's implementation, you'll have to explicitly call it, along these lines:
  Example:
 
-    ```javascript
+```javascript
          var MyModel = Rack.Model.extend({
              set: function(attributes) {
                 MyModel.__super__.set.apply(this, arguments);
                  ...
              }
          });
-     ```
+```
 
 ### 2. constructor/initialize
 
@@ -53,7 +53,7 @@ If you define an initialize function, it will be invoked when the model is creat
 
 Get the current value of an attribute from the model. For example:
    
- ```javascript
+```javascript
         myModel.get("title");
 ```
 
@@ -64,14 +64,14 @@ Get the current value of an attribute from the model. For example:
 Set a hash of attributes (one or many) on the model.
 You may also pass individual keys and values.
 
- ```javascript
+```javascript
         myModel.set({title: "March 20", content: "In his eyes she eclipses..."});
-    ```
+```
 or
 
-  ```javascript
+```javascript
         myModel.set("title", "A Scandal in Bohemia");
-    ```
+```
 
 ### 5. unset
 
@@ -79,9 +79,9 @@ or
 
 Remove an attribute by deleting it from the internal attributes.
 
-  ```javascript
+```javascript
         myModel.unset("title")
-    ```
+```
 
 ### 6. clear
 
@@ -89,9 +89,9 @@ Remove an attribute by deleting it from the internal attributes.
 
 Removes all attributes from the model.
 
- ```javascript
+```javascript
         myModel.clear()
-    ```
+```
 
 ### 7. watch
 
@@ -99,29 +99,29 @@ Removes all attributes from the model.
 
 Initialize handler for change value of watched property. Handler will be triggered if the value of watched property will change.
 
- ```javascript
+```javascript
         myModel.watch('title', function(e) {
             console.log('Changed');
             console.log('New '+e.key+' value is '+e.val);
         });
-    ```
+```
 
 If you want that handler was the same for several watched properties,
 you should pass the first arguments as Array, See Example:
 
- ```javascript
+```javascript
         myModel.watch(['title', 'content'], function(e) {
             console.log(e.key+' has changed'); //Callback will be called per every array-item (twice in this case)
         });
-    ```
+```
 
 If you want to watch for changing all model, you should mention a 'model' key-word as first argument
 
- ```javascript
+```javascript
         myModel.watch('model', function(e){
             console.log('Model has changed!');
         });
-    ```
+```
 
 ### 8. unwatch
 
@@ -131,13 +131,13 @@ Unbind the handler from watched property(ies)
 
 ```javascript
         myModel.unwatch('title')
-    ```
+```
 
 If you want to unbind all handlers from several properties you should pass the first arguments as Array, See Example:
 
- ```javascript
+```javascript
         myModel.unwatch(['title', 'content'])
-    ```
+```
 
 ### 9. toJSON
 
@@ -145,6 +145,6 @@ If you want to unbind all handlers from several properties you should pass the f
 
 export model attribute to JSON format
 
- ```javascript
+```javascript
         var jsonModel = myModel.toJSON();
-    ```
+```
