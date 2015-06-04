@@ -135,7 +135,7 @@
      * @param {Function} callback
      * @param {Object} context
      */
-    Helpers.defer = function(callback, context){
+    Helpers.defer = function (callback, context) {
         setTimeout(callback.bind(context), 0);
     };
 
@@ -144,13 +144,13 @@
      * @param {String} selector
      * return DOM element
      */
-    Helpers.getEl = function(selector){
+    Helpers.getEl = function (selector) {
         var type = selector[0], el;
-        if(selector.indexOf(' ')+1)
+        if (selector.indexOf(' ') + 1)
             el = document.querySelectorAll(selector);
-        else if(type=='#')
+        else if (type == '#')
             el = document.getElementById(selector.substring(1, selector.length));
-        else if(type=='.')
+        else if (type == '.')
             el = document.getElementsByClassName(selector.substring(1, selector.length));
         else
             el = document.getElementsByTagName(selector);
@@ -235,7 +235,8 @@
          * abstract @method initialize
          * initialization logic
          */
-        initialize: function () {},
+        initialize: function () {
+        },
         /**
          * @method set - set property as model attributes
          *
@@ -403,8 +404,8 @@
     Helpers.extend(View, {
         model: null,
         helpers: {},
-        tmpId: '',
-        tmpPath: '',
+        templateId: '',
+        path: '',
         container: 'body',
         tagName: 'div',
         id: '',
@@ -418,9 +419,9 @@
             if (Object.keys(this.attributes).length)
                 for (var key in this.attributes) {
                     if (this.attributes.hasOwnProperty(key))
-                        this[key] = unset? null : this.attributes[key];
+                        this[key] = unset ? null : this.attributes[key];
                 }
-                if(unset) this.attributes = {};
+            if (unset) this.attributes = {};
         },
         undelegateEvents: function () {
             if (!this.eventsMap.length) return;
@@ -429,20 +430,29 @@
             });
             this.eventsMap = [];
         },
-        getparentEl: function(){
-            if(!this.parentEl) {
+        getparentEl: function () {
+            if (!this.parentEl) {
                 var parentEl = Helpers.getEl(this.container);
-                this.parentEl = Helpers.getType(Array.prototype.slice.call(parentEl)) === 'Array'? parentEl[0] : parentEl;
+                this.parentEl = Helpers.getType(Array.prototype.slice.call(parentEl)) === 'Array' ? parentEl[0] : parentEl;
             }
             return this.parentEl;
         },
-        remove: function () {
-            this.setAttributes(true);
+        /**
+         *
+         * @param {Boolean} calledFromRender
+         * @returns {View}
+         */
+        remove: function (calledFromRender) {
+            !calledFromRender&&this.setAttributes(true);
             this.undelegateEvents();
-            this.removeEventListeners();
+            !calledFromRender&&this.removeEventListeners();
             this.getparentEl().removeChild(this.el);
             this.el = null;
-            this.template && this.templateContainer.removeChild(this.template);
+            this.parentEl = null;
+            if(this.template) {
+                this.templateContainer && this.templateContainer.removeChild(this.template);
+                this.template = null;
+            }
             return this;
         },
         delegateEvents: function () {
@@ -473,7 +483,8 @@
          * @param {String} name
          */
         unregisterHelper: function (name) {
-            this.helpers[name] = null;
+            if(this.helpers[name])
+                this.helpers[name] = null;
         },
 
         /**
@@ -551,49 +562,57 @@
             this.el.innerHTML = source;
             this.setupViewEvents();
         },
-        beforeRender: function(e){},
-        afterRender: function(e){},
-        addEventListeners: function(){
+        beforeRender: function (e) {
+        },
+        afterRender: function (e) {
+        },
+        addEventListeners: function () {
             this.el.addEventListener('beforeRender', this.beforeRender.bind(this), false);
             this.el.addEventListener('afterRender', this.afterRender.bind(this), false);
         },
-        removeEventListeners: function() {
+        removeEventListeners: function () {
             this.el.removeEventListener('beforeRender', this.beforeRender.bind(this), false);
             this.el.removeEventListener('afterRender', this.afterRender.bind(this), false);
         },
-        render: function () {
-            if(!this.templateContainer) {
-                this.templateContainer = Helpers.getEl('#templates') || (function () {
-                    var el = document.createElement('div');
-                    el.setAttribute('id', 'templates');
-                    document.body.appendChild(el);
-                    return el;
-                }());
-            }
-            if(!this.el) {
+        /**
+         *
+         * @param {Boolean} hardRerender
+         */
+        render: function (hardRerender) {
+            hardRerender&&this.remove(hardRerender);
+            if (!this.el) {
                 this.el = document.createElement(this.tagName);
                 this.addEventListeners();
                 this.id && this.el.setAttribute('id', this.id);
                 this.className && this.el.setAttribute('class', this.className);
             }
             this.el.dispatchEvent(new CustomEvent('beforeRender'));
-            if(!this.template)
-                this.template = Helpers.getEl('#'+this.tmpId);
+            if (!this.template)
+                this.template = Helpers.getEl('#' + this.templateId);
             if (this.template)
                 this.parseTemplate();
-            else if (this.tmpPath)
-                Service.get(this.tmpPath, true).then(function (response) {
+            else if (this.path) {
+                Service.get(this.path, true).then(function (response) {
+                    if(!this.templateContainer) {
+                        this.templateContainer = Helpers.getEl('#templates') || (function () {
+                            var el = document.createElement('div');
+                            el.setAttribute('id', 'templates');
+                            document.body.appendChild(el);
+                            return el;
+                        }());
+                    }
                     this.templateContainer.insertAdjacentHTML("beforeEnd", response);
-                    this.template = document.getElementById(this.tmpId);
+                    this.template = document.getElementById(this.templateId);
                     if (this.template)
                         this.parseTemplate();
                     else
-                        throw new Error('Template with id "' + this.tmpId + '" doesn\'t exist');
+                        throw new Error('Template with id "' + this.templateId + '" doesn\'t exist');
                 }.bind(this), function (xhr) {
                     throw new Error(xhr.responseURL + ' ' + xhr.statusText);
                 });
+            }
             this.getparentEl().appendChild(this.el);
-            Helpers.defer(function(){
+            Helpers.defer(function () {
                 this.el.dispatchEvent(new CustomEvent('afterRender'));
             }, this);
         },
