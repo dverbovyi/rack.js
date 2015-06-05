@@ -32,7 +32,7 @@ Example:
 ```
 
  * Brief aside on super: JavaScript does not provide a simple way to call super — the function of the same name defined
- higher on the prototype chain. If you override a core function like ```set``` (```get```, ```unset```, ```watch```, ```unwatch```, ```trigger```),
+ higher on the prototype chain. If you override a core function like ```render``` (```remove```, ```delegateEvents```, ```undelegateEvents```, ```setAttributes```, ```registerHelper```, ```unregisterHelper```, ```addEventListeners```, ```removeEventListeners```),
  and you want to invoke the parent object's implementation, you'll have to explicitly call it, along these lines:
 Example:
 
@@ -57,6 +57,14 @@ with key ```model```,
 See example:
 
 ```javascript
+        var MyView = Rack.View.extend({
+            ...
+            initialize: function(){
+                //some initialization logic
+                this.model.watch('title', this.render, this); //e.g. re-render view if title will change
+            }
+            ...
+        });
         var myView = new MyView({model: new Model()});
 ```
 
@@ -100,3 +108,100 @@ View template example:
             </ul>
         </script>
 ```
+
+You can dynamically set ```templateId, path```, but in this case you should call method ```this.render(true)``` for hard re-rendering your view
+
+### 5. remove
+
+    view.remove()
+    
+Removes a view and view's template from the DOM, remove any bound events and unset view's attributes
+
+### 6. events
+
+You can add DOM events listeners to your view like this:
+
+```javascript
+        var MyView = Rack.View.extend({
+           templateId: 'testTemplate',
+           path: './testTemplate.html',
+           tagName: 'ul',
+           id: 'some_id',
+           container: '#containert',
+           className: 'some_class',
+           events:{
+               'dblclick': 'open', //will be fired on whole this.el
+               'click li': 'doSomething',
+               'focus li span': 'doSomethingElse'
+           },
+           open: function(){...},
+           doSomething: function(){...},
+           doSomethingElse: function(){...}
+           ...
+        });
+```
+
+### 7. delegateEvents
+
+    view.delegateEvents()
+    
+Binding all DOM events listeners to your view.el. This method applied with View's initialization by default
+
+### 8. undelegateEvents
+
+    view.undelegateEvents()
+    
+Unbinding your view DOM events. Called automaticaly with ```view.remove()```
+
+### 9. beforeRender, afterRender
+
+Define this methods if you want to describe some logic before/after view rendering, e.g:
+
+```javascript
+        var MyView = Rack.View.extend({
+           templateId: 'testTemplate',
+           path: './testTemplate.html',
+           beforeRender: function(){
+                console.log('before render')
+           }, // will be called before view render
+           afterRender: function(){
+                console.log('after render')
+           } // will be called after view render
+        });
+```
+    
+### 10. registerHelper
+
+    view.registerHelper(name, function, context)
+    
+If you want to show in some special rules array or object data from your view's model, you should define an helper where describe what you need, example:
+
+```html
+        <script type="text/template" id="testTemplate">
+            <ul>
+                {{myList}}
+            </ul>
+        </script>
+```
+
+```javascript
+        var MyView = Rack.View.extend({
+           templateId: 'testTemplate',
+           path: './testTemplate.html',
+           initialize: function(){
+                this.registerHelper('list', function(){
+                   var str = '';
+                   this.model.get('myList').forEach(function(val){
+                      str+='<li>'+val+'</li>';
+                   });
+                   return str;
+                }, this);
+           }
+        });
+```
+
+### 11. unregisterHelper
+
+    view.unregisterHelper(name)
+    
+Remove defined helper by name
