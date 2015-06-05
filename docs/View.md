@@ -200,19 +200,6 @@ If you want to show in some special rules array or object data from your view's 
         });
 ```
 
-result example:
-
-```html
-        <script type="text/template" id="testTemplate">
-            <ul>
-                <li>item1</li>
-                <li>item2</li>
-                <li>item3</li>
-                <li>item4</li>
-            </ul>
-        </script>
-```
-
 ### 11. unregisterHelper
 
     view.unregisterHelper(name)
