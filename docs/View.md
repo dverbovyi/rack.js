@@ -109,7 +109,7 @@ View template example:
         </script>
 ```
 
-You can dynamically set ```templateId, path```, but in this case you should call method ```this.render(true)``` for hard re-rendering your view
+You can dynamically set ```templateId, path```, but after that you should call method ```this.render(true)``` for hard re-rendering your view and see result
 
 ### 5. remove
 
