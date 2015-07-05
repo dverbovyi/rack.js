@@ -122,11 +122,10 @@
             throw new Error(array + ' isn\'t Array');
         var u = {}, a = [];
         for (var i = 0, l = array.length; i < l; ++i) {
-            if (u.hasOwnProperty(array[i])) {
-                continue;
+            if (!u[array[i]]) {
+                a.push(array[i]);
+                u[array[i]] = 1;
             }
-            a.push(array[i]);
-            u[array[i]] = 1;
         }
         return a;
     };
@@ -469,6 +468,7 @@
             this.getparentEl().removeChild(this.el);
             this.el = null;
             this.parentEl = null;
+            this.helpers = {};
             if(this.template) {
                 this.templateContainer && this.templateContainer.removeChild(this.template);
                 this.template = null;
@@ -504,7 +504,7 @@
          *
          * @param {String} name
          */
-        unregisterHelper: function (name) {
+        deleteHelper: function (name) {
             if(this.helpers[name])
                 this.helpers[name] = null;
         },
