@@ -6,16 +6,16 @@ Tiny javascript MVC-framework for working with RESTful JSON interface.
 
 ##Documentation
 
-* [Rack.Model](#model)
-* [Rack.View](#view)
-* [Rack.Controller](#controller)
-* [Rack.Service](#service)
-* [Rack.Helpers](#helpers)
+* [Model](#model)
+* [View](#view)
+* [Controller](#controller)
+* [Service](#service)
+* [Helpers](#helpers)
 
 
 ## Model
  * [extend](#extend)
- * [constructor/initialize](#constructor\/initialize)
+ * [initialize](#initialize)
  * [get](#get)
  * [set](#set)
  * [unset](#unset)
