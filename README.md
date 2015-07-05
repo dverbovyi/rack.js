@@ -182,7 +182,7 @@ export model attribute to JSON format
  * [remove](#remove)
  * [events](#events)
  * [delegateEvents](#delegateevents)
- * [undelegateEvents](@undelegateevents)
+ * [undelegateEvents](#undelegateevents)
  * [before and after render](#before-and-after-render)
  * [registerHelper](#registerhelper)
  * [deleteHelper](#deletehelper)
