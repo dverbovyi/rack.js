@@ -6,7 +6,7 @@ Tiny javascript MVC-framework for working with RESTful JSON interface.
 
 ##Documentation
 
-* [Model](#model)
+* [Model](#rack.-model)
 * [View](#view)
 * [Controller](#controller)
 * [Service](#service)
