@@ -669,7 +669,15 @@
     });
     //-------------
 
-    Model.extend = View.extend = extend;
+    var Controller = Rack.Controller = function (attributes) {
+
+    };
+
+    Helpers.extend(Controller, {
+
+    });
+
+    Model.extend = View.extend = Controller.extend = extend;
 
     return Rack;
 });
