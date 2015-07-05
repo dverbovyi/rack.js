@@ -6,27 +6,26 @@ Tiny javascript MVC-framework for working with RESTful JSON interface.
 
 ##Documentation
 
-* [Model](#model)
-* [View](#view)
-* [Controller](#controller)
-* [Service](#service)
-* [Helpers](#helpers)
+* [Rack.Model](#model)
+* [Rack.View](#view)
+* [Rack.Controller](#controller)
+* [Rack.Service](#service)
+* [Rack.Helpers](#helpers)
 
 
-### Model
-Rack.Model API
-* 1. [extend](#extend)
-* 2. [constructor/initialize](#constructor/initialize)
-* 3. [get](#get)
-* 4. [set](#set)
-* 5. [unset](#unset)
-* 6. [clear](#clear)
-* 7. [watch](#watch)
-* 8. [unwatch](#unwatch)
-* 9. [toJSON](#toJSON)
+## Model
+ * [extend](#extend)
+ * [constructor/initialize](#constructor/initialize)
+ * [get](#get)
+ * [set](#set)
+ * [unset](#unset)
+ * [clear](#clear)
+ * [watch](#watch)
+ * [unwatch](#unwatch)
+ * [toJSON](#toJSON)
 
 
-### 1. extend
+### extend
 
     Rack.Model.extend(properties)
 
@@ -59,7 +58,7 @@ Example:
          });
 ```
 
-### 2. constructor/initialize
+### constructor/initialize
 
     new Model([attributes])
 
@@ -73,7 +72,7 @@ If you define an initialize function, it will be invoked when the model is creat
         });
 ```
 
-### 3. get
+### get
 
     model.get(attribute)
 
@@ -83,7 +82,7 @@ Get the current value of an attribute from the model. For example:
         myModel.get("title");
 ```
 
-### 4. set
+### set
 
     model.set(attributes)
 
@@ -99,7 +98,7 @@ or
         myModel.set("title", "A Scandal in Bohemia");
 ```
 
-### 5. unset
+### unset
 
     model.unset(attribute)
 
@@ -109,7 +108,7 @@ Remove an attribute by deleting it from the internal attributes.
         myModel.unset("title")
 ```
 
-### 6. clear
+### clear
 
     model.clear()
 
@@ -119,7 +118,7 @@ Removes all attributes from the model.
         myModel.clear()
 ```
 
-### 7. watch
+### watch
 
     model.watch(attribute, callback)
 
@@ -149,7 +148,7 @@ If you want to watch for changing all model, you should mention a 'model' key-wo
         });
 ```
 
-### 8. unwatch
+### unwatch
 
     model.unwatch(attribute)
 
@@ -165,7 +164,7 @@ If you want to unbind all handlers from several properties you should pass the f
         myModel.unwatch(['title', 'content'])
 ```
 
-### 9. toJSON
+### toJSON
 
     model.toJSON()
 
