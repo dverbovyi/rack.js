@@ -175,19 +175,19 @@ export model attribute to JSON format
 ```
 
 ### View
- * [extend](#extend)
- * [initialize](#initialize)
+ * [extend](#view-extend)
+ * [initialize](#view-initialize)
  * [el](#el)
- * [templateId, path](#templateId,-path)
+ * [templateId and path](#templateid-and-path)
  * [remove](#remove)
  * [events](#events)
- * [delegateEvents](#delegateEvents)
- * [undelegateEvents](@undelegateEvents)
- * [beforeRender, afterRender](#beforeRender,-afterRender)
- * [registerHelper](#registerHelper)
- * [deleteHelper](#deleteHelper)
+ * [delegateEvents](#delegateevents)
+ * [undelegateEvents](@undelegateevents)
+ * [before and after render](#before-and-after-render)
+ * [registerHelper](#registerhelper)
+ * [deleteHelper](#deletehelper)
  
- #### extend
+ #### View extend
 
     Rack.View.extend(properties)
 
@@ -234,7 +234,7 @@ Example:
         });
 ```
 
-#### initialize
+#### View initialize
 
     new View([attributes])
 
@@ -273,7 +273,7 @@ See example:
         });
 ```
 
-#### templateId, path
+#### templateId and path
 
     view.templateId, view.path
 
@@ -340,7 +340,7 @@ Binding all DOM events listeners to your view.el. This method applied with View'
     
 Unbinding your view DOM events. Called automaticaly with ```view.remove()```
 
-#### beforeRender, afterRender
+#### before and after Render
 
 Define this methods if you want to describe some logic before/after view rendering, e.g:
 
