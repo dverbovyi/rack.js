@@ -15,14 +15,14 @@ Tiny javascript MVC-framework for working with RESTful JSON interface.
 
 ## Model
  * [extend](#extend)
- * [constructor/initialize](#constructor/initialize)
+ * [constructor/initialize](#constructor-initialize)
  * [get](#get)
  * [set](#set)
  * [unset](#unset)
  * [clear](#clear)
  * [watch](#watch)
  * [unwatch](#unwatch)
- * [toJSON](#toJSON)
+ * [toJSON](#tojSON)
 
 
 ### extend
