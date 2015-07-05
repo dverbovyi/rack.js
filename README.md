@@ -13,7 +13,7 @@ Tiny javascript MVC-framework for working with RESTful JSON interface.
 * [Helpers](#helpers)
 
 
-## Model
+### Model
  * [extend](#extend)
  * [initialize](#initialize)
  * [get](#get)
@@ -25,7 +25,7 @@ Tiny javascript MVC-framework for working with RESTful JSON interface.
  * [toJSON](#tojson)
 
 
-### extend
+#### extend
 
     Rack.Model.extend(properties)
 
@@ -58,7 +58,7 @@ Example:
          });
 ```
 
-### constructor/initialize
+#### initialize
 
     new Model([attributes])
 
@@ -72,7 +72,7 @@ If you define an initialize function, it will be invoked when the model is creat
         });
 ```
 
-### get
+#### get
 
     model.get(attribute)
 
@@ -82,7 +82,7 @@ Get the current value of an attribute from the model. For example:
         myModel.get("title");
 ```
 
-### set
+#### set
 
     model.set(attributes)
 
@@ -98,7 +98,7 @@ or
         myModel.set("title", "A Scandal in Bohemia");
 ```
 
-### unset
+#### unset
 
     model.unset(attribute)
 
@@ -108,7 +108,7 @@ Remove an attribute by deleting it from the internal attributes.
         myModel.unset("title")
 ```
 
-### clear
+#### clear
 
     model.clear()
 
@@ -118,7 +118,7 @@ Removes all attributes from the model.
         myModel.clear()
 ```
 
-### watch
+#### watch
 
     model.watch(attribute, callback)
 
@@ -148,7 +148,7 @@ If you want to watch for changing all model, you should mention a 'model' key-wo
         });
 ```
 
-### unwatch
+#### unwatch
 
     model.unwatch(attribute)
 
@@ -164,7 +164,7 @@ If you want to unbind all handlers from several properties you should pass the f
         myModel.unwatch(['title', 'content'])
 ```
 
-### toJSON
+#### toJSON
 
     model.toJSON()
 
