@@ -179,13 +179,13 @@ export model attribute to JSON format
  * [initialize](#view-initialize)
  * [el](#el)
  * [templateId and path](#templateid-and-path)
- * [remove](#remove)
  * [events](#events)
  * [delegateEvents](#delegateevents)
  * [undelegateEvents](#undelegateevents)
  * [before and after render](#before-and-after-render)
  * [registerHelper](#registerhelper)
  * [deleteHelper](#deletehelper)
+ * [remove](#remove)
  
  #### View extend
 
