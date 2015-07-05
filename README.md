@@ -6,14 +6,14 @@ Tiny javascript MVC-framework for working with RESTful JSON interface.
 
 ##Documentation
 
-* [Model](#rack.-model)
-* [View](#view)
-* [Controller](#controller)
-* [Service](#service)
-* [Helpers](#helpers)
+* [Rack.Model](#model)
+* [Rack.View](#view)
+* [Rack.Controller](#controller)
+* [Rack.Service](#service)
+* [Rack.Helpers](#helpers)
 
 
-### Rack.Model
+### Model
 
  * [extend](#extend)
  * [initialize](#initialize)
@@ -184,7 +184,7 @@ export model attribute to JSON format
 ```
 
 
-### Rack.View
+### View
 
  * [extend](#view-extend)
  * [initialize](#view-initialize)
@@ -416,15 +416,15 @@ Remove defined helper by name
     
 Removes a view and view's template from the DOM, remove any bound events and unset view's attributes and helpers
 
-### Rack.Controller
+### Controller
 
 Under development
 
-### Rack.Service
+### Service
 
 Docs in progress
 
-### Rack.Helpers
+### Helpers
 
 Docs in progress
 Under development
