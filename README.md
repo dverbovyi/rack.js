@@ -413,3 +413,16 @@ Remove defined helper by name
     view.remove()
     
 Removes a view and view's template from the DOM, remove any bound events and unset view's attributes and helpers
+
+### Controller
+
+Under development
+
+### Service
+
+Docs in progress
+
+### Helpers
+
+Docs in progress
+Under development
