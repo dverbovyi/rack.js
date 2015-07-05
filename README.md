@@ -175,17 +175,17 @@ export model attribute to JSON format
 ```
 
 ### View
- *[extend](#extend)
- *[initialize](#initialize)
- *[el](#el)
- *[templateId, path](#templateId,-path)
- *[remove](#remove)
- *[events](#events)
- *[delegateEvents](#delegateEvents)
- *[undelegateEvents](@undelegateEvents)
- *[beforeRender, afterRender](#beforeRender,-afterRender)
- *[registerHelper](#registerHelper)
- *[deleteHelper](#deleteHelper)
+ * [extend](#extend)
+ * [initialize](#initialize)
+ * [el](#el)
+ * [templateId, path](#templateId,-path)
+ * [remove](#remove)
+ * [events](#events)
+ * [delegateEvents](#delegateEvents)
+ * [undelegateEvents](@undelegateEvents)
+ * [beforeRender, afterRender](#beforeRender,-afterRender)
+ * [registerHelper](#registerHelper)
+ * [deleteHelper](#deleteHelper)
  
  #### extend
 
