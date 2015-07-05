@@ -6,11 +6,11 @@ Tiny javascript MVC-framework for working with RESTful JSON interface.
 
 ##Documentation
 
-* [Model]
-* [View]
-* [Controller]
-* [Service]
-* [Helpers]
+* [Model](#model)
+* [View](#view)
+* [Controller](#controller)
+* [Service](#service)
+* [Helpers](#helpers)
 
 
 ### Model
