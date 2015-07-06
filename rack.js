@@ -236,7 +236,6 @@
     var Model = Rack.Model = function (attributes) {
         this.attributes = attributes || {};
         this.prevAttributes = {};
-        this.changed = true;
         this.listenersObj = {};
         var defaults = this.defaults;
         if (defaults) this.set(defaults);
@@ -259,19 +258,27 @@
          * @param {*} val
          */
         set: function (key, val) {
-            var keyType = Helpers.getType(key);
+            var keyType = Helpers.getType(key), _changed = false;
             if (keyType === 'Object') {
                 for (var index in key) {
-                    this.attributes[index] = key[index];
+                    if(key.hasOwnProperty(index)) {
+                        this.attributes[index] = key[index];
+                        if(this.prevAttributes[index]!=this.attributes[index]){
+                            _changed = true;
+                            this.trigger('change', index);
+                        }
+                    }
                 }
             } else if (keyType === 'Array') {
                 throw new Error('Incorrect input parameters');
             } else {
                 this.attributes[key] = val;
+                if(this.prevAttributes[key]!=this.attributes[key]){
+                    _changed = true;
+                    this.trigger('change', key);
+                }
             }
-            this.changed = !(JSON.stringify(this.prevAttributes) === JSON.stringify(this.attributes));
-            if (this.changed) {
-                this.trigger('change', key);
+            if (_changed){
                 this.prevAttributes = Helpers.clone(this.attributes);
             }
         },
@@ -413,7 +420,6 @@
         this.attributes = attributes || {};
         this.eventsMap = [];
         this.setAttributes();
-        this.initHelpers();
         this.initialize.apply(this, arguments);
         this.render();
     };
@@ -441,14 +447,14 @@
                 }
             if (unset) this.attributes = {};
         },
-        undelegateEvents: function () {
+       undelegateEvents: function () {
             if (!this.eventsMap.length) return;
             this.eventsMap.forEach(function (val) {
                 val.el.removeEventListener(val.type, val.handler, false);
             });
             this.eventsMap = [];
         },
-        getparentEl: function () {
+        getContainerEl: function () {
             if (!this.parentEl) {
                 var parentEl = Helpers.getEl(this.container);
                 this.parentEl = Helpers.getType(Array.prototype.slice.call(parentEl)) === 'Array' ? parentEl[0] : parentEl;
@@ -465,7 +471,7 @@
             !calledFromRender&&this.setAttributes(true);
             this.undelegateEvents();
             !calledFromRender&&this.removeEventListeners();
-            this.getparentEl().removeChild(this.el);
+            this.getContainerEl().removeChild(this.el);
             this.el = null;
             this.parentEl = null;
             this.helpers = {};
@@ -481,12 +487,6 @@
                 val.el.addEventListener(val.type, val.handler, false);
             });
         },
-
-        /**
-         * abstract @method initHelpers
-         * setup template helpers
-         */
-        initHelpers: function () {},
 
         /**
          *
@@ -632,7 +632,7 @@
                     throw new Error(xhr.responseURL + ' ' + xhr.statusText);
                 });
             }
-            this.getparentEl().appendChild(this.el);
+            this.getContainerEl().appendChild(this.el);
             Helpers.defer(function () {
                 this.el.dispatchEvent(new CustomEvent('afterRender'));
             }, this);
