@@ -669,11 +669,29 @@
     });
     //-------------
 
-    var Controller = Rack.Controller = function (attributes) {
-
+    var Controller = Rack.Controller = function (options) {
+        this.routes = options&&options.routes || {};
+        this.initialize.apply(this, arguments);
+        this.addEventListeners();
     };
 
     Helpers.extend(Controller, {
+
+        /**
+        * abstract @method initialize
+        * initialization logic
+        */
+        initialize: function () {},
+        addEventListeners: function(){
+            window.addEventListener('hashchange', this.hashChanged.bind(this), false);
+        },
+        hashChanged: function(e){
+            console.log(e);
+            console.log(this.getHash());
+        },
+        getHash: function(){
+            return window.location.hash.substring(1);
+        }
 
     });
 
