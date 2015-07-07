@@ -8,4 +8,26 @@
 <h3>...Under development...</h3>
 </body>
 <script type="text/javascript" src="./rack.js"></script>
+
+<script>
+    window.onload = function(){
+        var MyController = Rack.Controller.extend({
+            routes: {
+                "index": "home",
+                "about": "about",
+                "any": "any"
+            },
+            home: function(route){
+                console.log(route);
+            },
+            about: function(route){
+                console.log(route);
+            },
+            any: function(route){
+                console.log(route);
+            }
+        });
+        new MyController();
+    }
+</script>
 </html>

@@ -249,7 +249,8 @@
          * abstract @method initialize
          * initialization logic
          */
-        initialize: function () {},
+        initialize: function () {
+        },
 
         /**
          * @method set - set property as model attributes
@@ -261,9 +262,9 @@
             var keyType = Helpers.getType(key), _changed = false;
             if (keyType === 'Object') {
                 for (var index in key) {
-                    if(key.hasOwnProperty(index)) {
+                    if (key.hasOwnProperty(index)) {
                         this.attributes[index] = key[index];
-                        if(this.prevAttributes[index]!=this.attributes[index]){
+                        if (this.prevAttributes[index] != this.attributes[index]) {
                             _changed = true;
                             this.trigger('change', index);
                         }
@@ -273,12 +274,12 @@
                 throw new Error('Incorrect input parameters');
             } else {
                 this.attributes[key] = val;
-                if(this.prevAttributes[key]!=this.attributes[key]){
+                if (this.prevAttributes[key] != this.attributes[key]) {
                     _changed = true;
                     this.trigger('change', key);
                 }
             }
-            if (_changed){
+            if (_changed) {
                 this.prevAttributes = Helpers.clone(this.attributes);
             }
         },
@@ -447,7 +448,7 @@
                 }
             if (unset) this.attributes = {};
         },
-       undelegateEvents: function () {
+        undelegateEvents: function () {
             if (!this.eventsMap.length) return;
             this.eventsMap.forEach(function (val) {
                 val.el.removeEventListener(val.type, val.handler, false);
@@ -468,14 +469,14 @@
          * @returns {View}
          */
         remove: function (calledFromRender) {
-            !calledFromRender&&this.setAttributes(true);
+            !calledFromRender && this.setAttributes(true);
             this.undelegateEvents();
-            !calledFromRender&&this.removeEventListeners();
+            !calledFromRender && this.removeEventListeners();
             this.getContainerEl().removeChild(this.el);
             this.el = null;
             this.parentEl = null;
             this.helpers = {};
-            if(this.template) {
+            if (this.template) {
                 this.templateContainer && this.templateContainer.removeChild(this.template);
                 this.template = null;
             }
@@ -505,7 +506,7 @@
          * @param {String} name
          */
         deleteHelper: function (name) {
-            if(this.helpers[name])
+            if (this.helpers[name])
                 this.helpers[name] = null;
         },
 
@@ -513,7 +514,8 @@
          * abstract @method initialize
          * initialization logic
          */
-        initialize: function () {},
+        initialize: function () {
+        },
 
         /**
          *
@@ -584,8 +586,10 @@
             this.el.innerHTML = source;
             this.setupViewEvents();
         },
-        beforeRender: function (e) {},
-        afterRender: function (e) {},
+        beforeRender: function (e) {
+        },
+        afterRender: function (e) {
+        },
         addEventListeners: function () {
             this.el.addEventListener('beforeRender', this.beforeRender.bind(this), false);
             this.el.addEventListener('afterRender', this.afterRender.bind(this), false);
@@ -600,7 +604,7 @@
          * @param {Boolean} hardRerender
          */
         render: function (hardRerender) {
-            hardRerender&&this.remove(hardRerender);
+            hardRerender && this.remove(hardRerender);
             if (!this.el) {
                 this.el = document.createElement(this.tagName);
                 this.addEventListeners();
@@ -614,7 +618,7 @@
                 this.parseTemplate();
             else if (this.path) {
                 Service.get(this.path, true).then(function (response) {
-                    if(!this.templateContainer) {
+                    if (!this.templateContainer) {
                         this.templateContainer = Helpers.getEl('#templates') || (function () {
                             var el = document.createElement('div');
                             el.setAttribute('id', 'templates');
@@ -640,7 +644,7 @@
         setupViewEvents: function () {
             this.undelegateEvents();
             var events = this.events;
-            if (!events) return;
+            if (!Object.keys(events).length) return;
             for (var key in events) {
                 if (events.hasOwnProperty(key)) {
                     var parsedArr = key.split(' '),
@@ -669,28 +673,57 @@
     });
     //-------------
 
+    //Rack.View
+    //----------
     var Controller = Rack.Controller = function (options) {
-        this.routes = options&&options.routes || {};
+        var defaultRoutes = this.routes;
+        this.routes = options && options.routes || defaultRoutes;
         this.initialize.apply(this, arguments);
         this.addEventListeners();
+        this.checkRoute();
     };
 
     Helpers.extend(Controller, {
 
         /**
-        * abstract @method initialize
-        * initialization logic
-        */
+         * abstract @method initialize
+         * initialization logic
+         */
         initialize: function () {},
-        addEventListeners: function(){
-            window.addEventListener('hashchange', this.hashChanged.bind(this), false);
+        addEventListeners: function () {
+            window.addEventListener('hashchange', this.checkRoute.bind(this), false);
         },
-        hashChanged: function(e){
-            console.log(e);
-            console.log(this.getHash());
+
+        /**
+         *
+         * @param {String} route
+         */
+        navigate: function (route) {
+            var routes = this.routes;
+            if (!Object.keys(routes).length)
+                return;
+            if (!route.length) {
+                location.hash = routes['index'] && 'index' || 'any';
+                return;
+            }
+            if (routes[route]) {
+                location.hash = route;
+                this[routes[route]].call(this, route)
+            } else if (routes['any']) {
+                location.hash = 'any';
+            }
         },
-        getHash: function(){
+        getHash: function () {
             return window.location.hash.substring(1);
+        },
+
+        /**
+         *
+         * @param {Object} e - HashChangeEvent
+         */
+        checkRoute: function (e) {
+            if (!e || e.returnValue)
+                this.navigate(this.getHash())
         }
 
     });
