@@ -696,15 +696,17 @@
 
         /**
          *
-         * @param {String} route
+         * @param {String} path
          */
-        navigate: function (route) {
-            var routes = this.routes;
+        navigate: function (path) {
+            var routes = this.routes,
+                params = path.split('/'),
+                route = params.shift();
             if (!Object.keys(routes).length)
                 return;
             if (routes[route]) {
-                location.hash = route;
-                this[routes[route]].call(this, route)
+                location.hash = path;
+                this[routes[route]].call(this, route, params);
             } else if (routes['any']) {
                 location.hash = 'any';
             }

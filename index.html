@@ -38,11 +38,13 @@ test routing example
         home: function(route){
             console.log('home');
         },
-        about: function(route){
+        about: function(route, params){
             console.log('about');
+            console.log(params);
         },
-        contacts: function(){
-            console.log('contacts')
+        contacts: function(route, params){
+            console.log('contacts');
+            console.log(params);
         },
         any: function(route){
             console.log('any');
