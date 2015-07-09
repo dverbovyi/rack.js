@@ -702,10 +702,6 @@
             var routes = this.routes;
             if (!Object.keys(routes).length)
                 return;
-            if (!route.length) {
-                location.hash = routes['index'] && 'index' || 'any';
-                return;
-            }
             if (routes[route]) {
                 location.hash = route;
                 this[routes[route]].call(this, route)

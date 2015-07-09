@@ -6,27 +6,49 @@
 <body>
 <h1>Tiny Framework Rack.js</h1>
 <h3>...Under development...</h3>
+
+<hr/>
+test routing example
+<ul>
+    <li>
+        <a href="#about">About</a>
+    </li>
+    <li>
+        <a href="#home">Home</a>
+    </li>
+    <li>
+        <a href="#contacts">Contacts</a>
+    </li>
+</ul>
 </body>
 <script type="text/javascript" src="./rack.js"></script>
 
 <script>
+    var MyController = Rack.Controller.extend({
+        routes: {
+            "": "index",
+            "home": "home",
+            "about": "about",
+            "contacts": "contacts",
+            "any": "any"
+        },
+        index: function(){
+            console.log('index');
+        },
+        home: function(route){
+            console.log('home');
+        },
+        about: function(route){
+            console.log('about');
+        },
+        contacts: function(){
+            console.log('contacts')
+        },
+        any: function(route){
+            console.log('any');
+        }
+    });
     window.onload = function(){
-        var MyController = Rack.Controller.extend({
-            routes: {
-                "index": "home",
-                "about": "about",
-                "any": "any"
-            },
-            home: function(route){
-                console.log(route);
-            },
-            about: function(route){
-                console.log(route);
-            },
-            any: function(route){
-                console.log(route);
-            }
-        });
         new MyController();
     }
 </script>
