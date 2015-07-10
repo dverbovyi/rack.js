@@ -421,6 +421,7 @@ Removes a view and view's template from the DOM, remove any bound events and uns
 
  * [extend](#router-extend)
  * [initialize](#router-initialize)
+ * [controller](#router-controller)
  * [routes](#routes)
  * [getHash](#gethash)
  * [navigate](#navigate)
