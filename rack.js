@@ -32,6 +32,48 @@
         return child;
     };
 
+    /**
+     * @method watch - initialize handler for watched property
+     *
+     * @param {String|Array} prop
+     * @param {Function} callback
+     * @param {Object} context
+     */
+    var watch = function (prop, callback, context) {
+        var ctx = context || this,
+            type = Helpers.getType(prop);
+        if (type === 'Array') {
+            prop.forEach(function (val) {
+                this.listenersObj[val] = callback.bind(ctx);
+            }.bind(this));
+        } else if (type === 'unknown' || type === 'Object') {
+            throw new Error('Incorrect input parameters');
+        } else {
+            this.listenersObj[prop] = callback.bind(ctx);
+        }
+    };
+
+    /**
+     * @method unwatch - delete watching property
+     *
+     * @param {String|Array} prop
+     */
+    var unwatch = function (prop) {
+        var propType = Helpers.getType(prop);
+        if (propType === 'Array') {
+            prop.forEach(function (val) {
+                if (this.listenersObj[val])
+                    this.listenersObj[val] = null;
+            }.bind(this));
+        } else if (propType === 'Object') {
+            throw new Error('Incorrect input parameters');
+        } else {
+            if (this.listenersObj[prop]) {
+                this.listenersObj[prop] = null;
+            }
+        }
+    };
+
     // Rack.Helpers
     //----------------
     var Helpers = Rack.Helpers = function () {
@@ -318,17 +360,7 @@
          * @param {Object} context
          */
         watch: function (prop, callback, context) {
-            var ctx = context || this,
-                type = Helpers.getType(prop);
-            if (type === 'Array') {
-                prop.forEach(function (val) {
-                    this.listenersObj[val] = callback.bind(ctx);
-                }.bind(this));
-            } else if (type === 'unknown' || type === 'Object') {
-                throw new Error('Incorrect input parameters');
-            } else {
-                this.listenersObj[prop] = callback.bind(ctx);
-            }
+            watch.apply(this, arguments);
         },
 
         /**
@@ -337,19 +369,7 @@
          * @param {String} prop
          */
         unwatch: function (prop) {
-            var propType = Helpers.getType(prop);
-            if (propType === 'Array') {
-                prop.forEach(function (val) {
-                    if (this.listenersObj[val])
-                        this.listenersObj[val] = null;
-                }.bind(this));
-            } else if (propType === 'Object') {
-                throw new Error('Incorrect input parameters');
-            } else {
-                if (this.listenersObj[prop]) {
-                    this.listenersObj[prop] = null;
-                }
-            }
+            unwatch.apply(this, arguments);
         },
 
         /**
@@ -514,8 +534,7 @@
          * abstract @method initialize
          * initialization logic
          */
-        initialize: function () {
-        },
+        initialize: function () {},
 
         /**
          *
@@ -586,17 +605,23 @@
             this.el.innerHTML = source;
             this.setupViewEvents();
         },
-        beforeRender: function (e) {
-        },
-        afterRender: function (e) {
-        },
+
+        /**
+         * abstract @method beforeRender
+         */
+        beforeRender: function (e) {},
+
+        /**
+         * abstract @method onRender
+         */
+        onRender: function (e) {},
         addEventListeners: function () {
             this.el.addEventListener('beforeRender', this.beforeRender.bind(this), false);
-            this.el.addEventListener('afterRender', this.afterRender.bind(this), false);
+            this.el.addEventListener('onRender', this.onRender.bind(this), false);
         },
         removeEventListeners: function () {
             this.el.removeEventListener('beforeRender', this.beforeRender.bind(this), false);
-            this.el.removeEventListener('afterRender', this.afterRender.bind(this), false);
+            this.el.removeEventListener('onRender', this.onRender.bind(this), false);
         },
 
         /**
@@ -638,7 +663,7 @@
             }
             this.getContainerEl().appendChild(this.el);
             Helpers.defer(function () {
-                this.el.dispatchEvent(new CustomEvent('afterRender'));
+                this.el.dispatchEvent(new CustomEvent('onRender'));
             }, this);
         },
         setupViewEvents: function () {
@@ -678,8 +703,9 @@
     var Router = Rack.Router = function (options) {
         var routes = this.routes,
             controller = this.controller;
-        this.routes = options && options.routes || routes;
-        this.controller = options && options.controller || controller;
+        this.options = options || {};
+        this.routes =  this.options.routes || routes;
+        this.controller =  this.options.controller || controller;
         this.initialize.apply(this, arguments);
         this.addEventListeners();
         this.checkRoute();
@@ -694,6 +720,9 @@
         initialize: function () {},
         addEventListeners: function () {
             window.addEventListener('hashchange', this.checkRoute.bind(this), false);
+        },
+        removeEventListeners: function(){
+            window.removeEventListener('hashchange', this.checkRoute.bind(this), false);
         },
 
         /**
@@ -710,12 +739,12 @@
             });
             var hashPath = route+'/'+params.join('/');
             if (routes[route]) {
-                location.hash = params.length&&hashPath || route;
                 try {
                     this.controller.actions[routes[route]].call(this, route, args);
                 } catch (e){
                     throw new Error("Method '"+routes[route]+"' doesn\'t exist in Controller\'s actions");
                 }
+                location.hash = params.length&&hashPath || route;
             } else if (routes['any']) {
                 location.hash = 'any';
             }
@@ -740,21 +769,49 @@
     //----------
     var Controller = Rack.Controller = function (options) {
         this.options = options || {};
-        var actions = this.actions;
-        this.actions = options.actions || actions;
+        this.listenersObj = {};
         this.initialize.apply(this, arguments);
     };
 
     Helpers.extend(Controller, {
+        actions: {},
         /**
          * abstract @method initialize
          * initialization logic
          */
-        initialize: function () {}
+        initialize: function () {},
+        beforeDestroy: function(){},
+        onDestroy: function(){},
+        destroy: function(){},
+
+        /**
+         * @method subscribe - initialize handler for watched property
+         *
+         * @param {String|Array} prop
+         * @param {Function} callback
+         * @param {Object} context
+         */
+        subscribe: function(prop, callback, context){
+            watch.apply(this, arguments);
+        },
+
+        /**
+         * @method unwatch - delete watching property
+         *
+         * @param {String|Array} prop
+         */
+        unSubscribe: function(prop){
+            unwatch.apply(this, arguments);
+        }
     });
 
     Model.extend = View.extend = Router.extend = Controller.extend = extend;
 
-    //TODO Helpers - merge object method
+    //TODO:
+    // Controller:
+    //  - publish method
+    //  - destroy method
+    // Helpers :
+    //  - merge method - merge 2 objects
     return Rack;
 });

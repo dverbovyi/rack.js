@@ -194,7 +194,7 @@ export model attribute to JSON format
  * [events](#events)
  * [delegateEvents](#delegateevents)
  * [undelegateEvents](#undelegateevents)
- * [before and after render](#before-and-after-render)
+ * [beforeRender and onRender Events](#beforerender-and-onrender-events)
  * [registerHelper](#registerhelper)
  * [deleteHelper](#deletehelper)
  * [remove](#remove)
@@ -227,7 +227,7 @@ Example:
            },
            handler: function(){...},
            beforeRender: function(){...}, // will be called before template render
-           afterRender: function(){...} // will be called after template render
+           onRender: function(){...} // will be called after template render
         });
 ```
 
@@ -354,7 +354,7 @@ Binding all DOM events listeners to your view.el. This method applied with View'
 Unbinding your view DOM events. Called automaticaly with ```view.remove()```
 
 
-#### before and after Render
+#### beforeRender and onRender event
 
 Define this methods if you want to describe some logic before/after view rendering, e.g:
 
@@ -365,7 +365,7 @@ Define this methods if you want to describe some logic before/after view renderi
            beforeRender: function(){
                 console.log('before render')
            }, // will be called before view render
-           afterRender: function(){
+           onRender: function(){
                 console.log('after render')
            } // will be called after view render
         });
