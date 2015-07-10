@@ -8,6 +8,7 @@ Tiny javascript MVC-framework for working with RESTful JSON interface.
 
 * [Rack.Model](#model)
 * [Rack.View](#view)
+* [Rack.Router](#router)
 * [Rack.Controller](#controller)
 * [Rack.Service](#service)
 * [Rack.Helpers](#helpers)
@@ -416,8 +417,24 @@ Remove defined helper by name
     
 Removes a view and view's template from the DOM, remove any bound events and unset view's attributes and helpers
 
+### Router
+
+ * [extend](#router-extend)
+ * [initialize](#router-initialize)
+ * [controller](#router-controller)
+ * [routes](#routes)
+ * [getHash](#gethash)
+ * [navigate](#navigate)
+
+Docs in progress
+
 ### Controller
 
+ * [extend](#controller-extend)
+ * [initialize](#controller-initialize)
+ * [beforeDestroy](#beforeDestroy)
+ * [destroy](#destroy)
+ 
 Under development
 
 ### Service
