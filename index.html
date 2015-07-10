@@ -25,6 +25,30 @@ test routing example
 
 <script>
     var MyController = Rack.Controller.extend({
+        actions: {
+            index: function(){
+                alert('index')
+            },
+            home: function(){
+                alert('home');
+            },
+            about: function(){
+                alert('about');
+            },
+            contacts: function(){
+                alert('contacts')
+            },
+            any: function(route){
+                alert('any');
+                console.log(route);
+            }
+        },
+        initialize: function(){
+            console.log('initialize Controller');
+        }
+    });
+    var MyRouter = Rack.Router.extend({
+        controller: new MyController(),
         routes: {
             "": "index",
             "home": "home",
@@ -32,26 +56,12 @@ test routing example
             "contacts": "contacts",
             "any": "any"
         },
-        index: function(){
-            console.log('index');
-        },
-        home: function(route){
-            console.log('home');
-        },
-        about: function(route, params){
-            console.log('about');
-            console.log(params);
-        },
-        contacts: function(route, params){
-            console.log('contacts');
-            console.log(params);
-        },
-        any: function(route){
-            console.log('any');
+        initialize: function(){
+            console.log('initialize Router');
         }
     });
     window.onload = function(){
-        new MyController();
+        new MyRouter();
     }
 </script>
 </html>

@@ -673,17 +673,19 @@
     });
     //-------------
 
-    //Rack.View
+    //Rack.Router
     //----------
-    var Controller = Rack.Controller = function (options) {
-        var defaultRoutes = this.routes;
-        this.routes = options && options.routes || defaultRoutes;
+    var Router = Rack.Router = function (options) {
+        var routes = this.routes,
+            controller = this.controller;
+        this.routes = options && options.routes || routes;
+        this.controller = options && options.controller || controller;
         this.initialize.apply(this, arguments);
         this.addEventListeners();
         this.checkRoute();
     };
 
-    Helpers.extend(Controller, {
+    Helpers.extend(Router, {
 
         /**
          * abstract @method initialize
@@ -701,12 +703,19 @@
         navigate: function (path) {
             var routes = this.routes,
                 params = path.split('/'),
-                route = params.shift();
-            if (!Object.keys(routes).length)
-                return;
+                route = params.shift(),
+                args = [];
+            params.forEach(function(v){
+                if(v.length) args.push(v);
+            });
+            var hashPath = route+'/'+params.join('/');
             if (routes[route]) {
-                location.hash = path;
-                this[routes[route]].call(this, route, params);
+                location.hash = params.length&&hashPath || route;
+                try {
+                    this.controller.actions[routes[route]].call(this, route, args);
+                } catch (e){
+                    throw new Error("Method '"+routes[route]+"' doesn\'t exist in Controller\'s actions");
+                }
             } else if (routes['any']) {
                 location.hash = 'any';
             }
@@ -720,13 +729,32 @@
          * @param {Object} e - HashChangeEvent
          */
         checkRoute: function (e) {
-            if (!e || e.returnValue)
-                this.navigate(this.getHash())
+            if (!e || e.returnValue){
+                this.navigate(this.getHash());
+            }
         }
-
     });
 
-    Model.extend = View.extend = Controller.extend = extend;
 
+    //Rack.Controller
+    //----------
+    var Controller = Rack.Controller = function (options) {
+        this.options = options || {};
+        var actions = this.actions;
+        this.actions = options.actions || actions;
+        this.initialize.apply(this, arguments);
+    };
+
+    Helpers.extend(Controller, {
+        /**
+         * abstract @method initialize
+         * initialization logic
+         */
+        initialize: function () {}
+    });
+
+    Model.extend = View.extend = Router.extend = Controller.extend = extend;
+
+    //TODO Helpers - merge object method
     return Rack;
 });
