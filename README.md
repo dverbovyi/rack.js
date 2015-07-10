@@ -429,7 +429,7 @@ Docs in progress
 
 ### Controller
 
- * [extend](#controller)
+ * [extend](#controller-extend)
  * [initialize](#controller-initialize)
  * [beforeDestroy](#beforeDestroy)
  * [destroy](#destroy)
