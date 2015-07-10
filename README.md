@@ -416,9 +416,15 @@ Remove defined helper by name
     
 Removes a view and view's template from the DOM, remove any bound events and unset view's attributes and helpers
 
-### Controller
+### Router
 
-Under development
+ * [extend](#router-extend)
+ * [initialize](#router-initialize)
+ * [routes](#routes)
+ * [getHash](#gethash)
+ * [navigate](#navigate)
+
+Docs in progress
 
 ### Service
 
