@@ -398,22 +398,11 @@
          */
         trigger: function (event, watchKey) {
             if (event == 'change') {
-                if (Helpers.getType(watchKey) === 'Object') {
-                    for (var index in watchKey) {
-                        if (watchKey.hasOwnProperty(index) && this.listenersObj[index]) {
-                            this.listenersObj[index]({
-                                key: index,
-                                value: this.get(index)
-                            });
-                        }
-                    }
-                } else {
-                    if (this.listenersObj[watchKey]) {
-                        this.listenersObj[watchKey]({
-                            key: watchKey,
-                            value: this.get(watchKey)
-                        });
-                    }
+                if (this.listenersObj[watchKey]) {
+                    this.listenersObj[watchKey]({
+                        key: watchKey,
+                        value: this.get(watchKey)
+                    });
                 }
                 if (this.listenersObj['model']) {
                     this.listenersObj['model']({
@@ -740,7 +729,7 @@
             var hashPath = route+'/'+params.join('/');
             if (routes[route]) {
                 try {
-                    this.controller.actions[routes[route]].call(this, route, args);
+                    this.controller.actions[routes[route]].call(this.controller, route, args);
                 } catch (e){
                     throw new Error("Method '"+routes[route]+"' doesn\'t exist in Controller\'s actions");
                 }
@@ -775,33 +764,58 @@
 
     Helpers.extend(Controller, {
         actions: {},
+
         /**
          * abstract @method initialize
          * initialization logic
          */
         initialize: function () {},
+
+        /**
+         * abstract @method beforeRender
+         */
         beforeDestroy: function(){},
+
+        /**
+         * abstract @method beforeRender
+         */
         onDestroy: function(){},
-        destroy: function(){},
+        destroy: function(){
+            this.listenersObj = {};
+        },
 
         /**
          * @method subscribe - initialize handler for watched property
          *
-         * @param {String|Array} prop
+         * @param {String|Array} event
          * @param {Function} callback
          * @param {Object} context
          */
-        subscribe: function(prop, callback, context){
+        subscribe: function(event, callback, context){
             watch.apply(this, arguments);
         },
 
         /**
-         * @method unwatch - delete watching property
+         * @method unsubscribe - delete watching property
          *
-         * @param {String|Array} prop
+         * @param {String|Array} event
          */
-        unSubscribe: function(prop){
+        unsubscribe: function(event){
             unwatch.apply(this, arguments);
+        },
+
+        /**
+         *
+         * @param {String} event
+         * @param {*} value
+         */
+        publish: function(event, value){
+            if (this.listenersObj[event]) {
+                this.listenersObj[event]({
+                    key: event,
+                    value: value
+                });
+            }
         }
     });
 
@@ -809,7 +823,6 @@
 
     //TODO:
     // Controller:
-    //  - publish method
     //  - destroy method
     // Helpers :
     //  - merge method - merge 2 objects
