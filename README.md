@@ -432,9 +432,14 @@ Docs in progress
 
  * [extend](#controller-extend)
  * [initialize](#controller-initialize)
- * [beforeDestroy](#beforeDestroy)
+ * [subscribe](#subscribe)
+ * [unsubscribe](#unsubscribe)
+ * [publish](#publish)
  * [destroy](#destroy)
- 
+ * [beforeDestroy](#beforeDestroy)
+ * [ondestroy](#ondestroy)
+
+Docs in progress
 Under development
 
 ### Service
