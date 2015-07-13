@@ -707,6 +707,7 @@
     //----------
     var Router = Rack.Router = function (attributes) {
         this.attributes = attributes || {};
+        this.controller = {};
         var defaultRoutes = this.routes;
         setAttributes.apply(this);
         this.routes = Helpers.mergeObjects(defaultRoutes, this.attributes.routes);
@@ -729,7 +730,7 @@
         removeEventListeners: function(){
             window.removeEventListener('hashchange', this.checkRoute.bind(this), false);
         },
-        destroy: function(){
+        stop: function(){
             this.removeEventListeners();
             setAttributes.call(this, true);
             this.routes = {};
@@ -747,17 +748,20 @@
             params.forEach(function(v){
                 if(v.length) args.push(v);
             });
-            var hashPath = route+'/'+params.join('/');
+            var hashPath = route+'/'+params.join('/'),
+                navigateTo = hashPath;
             if (routes[route]) {
                 try {
                     this.controller.actions[routes[route]].call(this.controller, route, args);
                 } catch (e){
                     throw new Error("Method '"+routes[route]+"' doesn\'t exist in Controller\'s actions");
                 }
-                location.hash = params.length&&hashPath || route;
-            } else if (routes['any']) {
-                location.hash = 'any';
-            }
+                navigateTo = params.length&&hashPath || route;
+            } else if(routes['any']){
+                navigateTo = 'any';
+            } else
+                navigateTo = hashPath;
+            location.hash = navigateTo;
         },
         getHash: function () {
             return window.location.hash.substring(1);
