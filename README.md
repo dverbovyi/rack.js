@@ -579,7 +579,7 @@ Get route name with params
 
     router.navigate(route)
 
-For realize forced navigation or redirection you can use ```navigate```:
+To implement forced navigation or redirection use ```navigate```:
 
 ```javascript
     router.navigate('about/me')
