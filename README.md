@@ -328,7 +328,7 @@ You can add DOM events listeners to your view like this:
            container: '#containert',
            className: 'some_class',
            events:{
-               'dblclick': 'open', //will be fired on whole this.el
+               'dblclick': 'open', //will be fired on whole this.el (e.g., tagName: 'ul',)
                'click li': 'doSomething',
                'focus li span': 'doSomethingElse'
            },
@@ -425,8 +425,171 @@ Removes a view and view's template from the DOM, remove any bound events and uns
  * [routes](#routes)
  * [getHash](#gethash)
  * [navigate](#navigate)
+ * [stop](#stop)
 
-Docs in progress
+#### Router extend
+
+    Rack.Router.extend(properties)
+    
+To create a Router class of your own, you extend ```Rack.Router``` and provide instance properties,
+as well options to be attached directly to the constructor function.
+
+extend correctly sets up the prototype chain, so subclasses created with the bellow described way
+can be further extended and subclassed as far as you like.
+Example:
+
+```javascript
+        var MyRouter = Rack.Router.extend({
+            controller: myController,
+            routes: {
+                "": "index",
+                "home": "home",
+                "about": "about",
+                "contacts": "contacts",
+                "any": "any"
+            },
+            initialize: function(){
+            //some initialization logic
+            }
+        });
+```
+
+ * Brief aside on super: JavaScript does not provide a simple way to call super — the function of the same name defined
+ higher on the prototype chain. If you override a core function like ```navigate``` (```destroy```, ```getHash```, ```checkRoute```, ```addEventListeners```, ```removeEventListeners```),
+ and you want to invoke the parent object's implementation, you'll have to explicitly call it, along these lines:
+Example:
+
+```javascript
+        var MyRouter = Rack.Router.extend({
+            ...
+            navigate: function(route){
+                MyView.__super__.navigate.apply(this, arguments);
+                ...
+            }
+            ...
+        });
+```
+
+
+#### Router initialize
+
+    new Router([attributes])
+
+When creating an instance of a router, you can pass in the initial values of the attributes, which will be available in
+the router. 
+See example:
+
+```javascript
+        var MyRouter = Rack.Router.extend({
+            ...
+            initialize: function(){
+                //some initialization logic
+            }
+            ...
+        });
+        var myRouter = new MyRouter({
+            controller: new MyController(),
+            routes: {
+                "": "index",
+                "home": "home",
+                "about": "about",
+                "contacts": "contacts",
+                "any": "any"
+            }
+        });
+        
+```
+
+or initialize base properties in class. It's up to your
+
+```javascript
+        var MyRouter = Rack.Router.extend({
+            controller: new MyController(),
+            routes: {
+                "": "index",
+                "home": "home",
+                "about": "about",
+                "contacts": "contacts",
+                "any": "any"
+            },
+            initialize: function(){
+                //some initialization logic
+            }
+            ...
+        });
+        var myRouter = new MyRouter();
+        
+```
+
+#### Router сontroller
+
+    router.controller
+    
+Binded controller object for handling your route's events. You can use an instance of [Rack.Controller](#controller) or create your own example, see:
+
+```javascript
+        var customController = {
+            actions: {
+                indexAction: function(route, params){console.log('index')},
+                homeAction: function(route, params){console.log('home')},
+                aboutAction: function(route, params){console.log('about')},
+                notFoundAction: function(route, params){console.log('page not found')}
+            }
+        }
+    
+        var MyRouter = Rack.Router.extend({
+            controller: customController,
+            routes: {
+                "": "indexAction",
+                "home": "homeAction",
+                "about": "aboutAction",
+                "any": "notFoundAction"
+            }
+        });
+```
+
+#### routes
+
+    router.routes
+    
+Define your hash-routes in routes-object as key(route name) - value(controller action's name).
+
+
+```javascript
+        var MyRouter = Rack.Router.extend({
+            controller: controller,
+            routes: {
+                "": "indexAction", 
+                "home": "homeAction",
+                "about": "aboutAction",
+                "any": "notFoundAction"
+            }
+        });
+```
+
+    e.g, http://example.com/#routeName/param1/param2... 
+    
+#### getHash
+
+    router.getHash()
+    
+Get route name with params
+
+#### navigate
+
+    router.navigate(route)
+
+For realize forced navigation or redirection you can use ```navigate```:
+
+```javascript
+    router.navigate('about/me')
+```
+
+#### stop
+
+    router.stop()
+    
+Remove route-change listener, clear binded routes and destroy all attributes.
 
 ### Controller
 
@@ -440,7 +603,6 @@ Docs in progress
  * [ondestroy](#ondestroy)
 
 Docs in progress
-Under development
 
 ### Service
 
@@ -448,5 +610,4 @@ Docs in progress
 
 ### Helpers
 
-Docs in progress
 Under development
