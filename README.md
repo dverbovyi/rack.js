@@ -376,7 +376,7 @@ Define this methods if you want to describe some logic before/after view renderi
 
     view.registerHelper(name, function, context)
     
-If you want to show in some special rules array or object data from your view's model, you should define an helper where describe what you need, example:
+If you want to show in some special rules array or object data from your view's model, you should define a helper where describe what you need, example:
 
 ```html
         <script type="text/template" id="testTemplate">
@@ -392,9 +392,9 @@ Basic example:
            templateId: 'testTemplate',
            path: './testTemplate.html',
            initialize: function(){
-                this.registerHelper('list', function(){
+                this.registerHelper('myList', function(){
                    var str = '';
-                   this.model.get('myList').forEach(function(val){
+                   this.model.get('list').forEach(function(val){
                       str+='<li>'+val+'</li>';
                    });
                    return str;
@@ -455,7 +455,7 @@ Example:
 ```
 
  * Brief aside on super: JavaScript does not provide a simple way to call super — the function of the same name defined
- higher on the prototype chain. If you override a core function like ```navigate``` (```destroy```, ```getHash```, ```checkRoute```, ```addEventListeners```, ```removeEventListeners```),
+ higher on the prototype chain. If you override a core function like ```navigate``` (```stop```, ```getHash```, ```checkRoute```, ```addEventListeners```, ```removeEventListeners```),
  and you want to invoke the parent object's implementation, you'll have to explicitly call it, along these lines:
 Example:
 
