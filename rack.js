@@ -74,6 +74,19 @@
         }
     };
 
+    /**
+     *
+     * @param {Boolean} unset
+     */
+    var setAttributes = function (unset) {
+        if (Object.keys(this.attributes).length)
+            for (var key in this.attributes) {
+                if (this.attributes.hasOwnProperty(key))
+                    this[key] = unset ? null : this.attributes[key];
+            }
+        if (unset) this.attributes = {};
+    };
+
     // Rack.Helpers
     //----------------
     var Helpers = Rack.Helpers = function () {
@@ -197,6 +210,21 @@
         else
             el = document.getElementsByTagName(selector);
         return el;
+    };
+
+    /**
+     *
+     * @param obj1
+     * @param obj2
+     * @returns {Object}
+     */
+    Helpers.mergeObjects = function(obj1, obj2){
+        for(var key in obj2){
+            if(obj2.hasOwnProperty(key)){
+                obj1[key] = obj2[key]
+            }
+        }
+        return obj1;
     };
     //-------------------------
 
@@ -429,7 +457,7 @@
     var View = Rack.View = function (attributes) {
         this.attributes = attributes || {};
         this.eventsMap = [];
-        this.setAttributes();
+        setAttributes.apply(this);
         this.initialize.apply(this, arguments);
         this.render();
     };
@@ -445,18 +473,6 @@
         className: '',
         events: {},
 
-        /**
-         *
-         * @param {Boolean} unset
-         */
-        setAttributes: function (unset) {
-            if (Object.keys(this.attributes).length)
-                for (var key in this.attributes) {
-                    if (this.attributes.hasOwnProperty(key))
-                        this[key] = unset ? null : this.attributes[key];
-                }
-            if (unset) this.attributes = {};
-        },
         undelegateEvents: function () {
             if (!this.eventsMap.length) return;
             this.eventsMap.forEach(function (val) {
@@ -478,7 +494,7 @@
          * @returns {View}
          */
         remove: function (calledFromRender) {
-            !calledFromRender && this.setAttributes(true);
+            !calledFromRender && setAttributes.call(this, true);
             this.undelegateEvents();
             !calledFromRender && this.removeEventListeners();
             this.getContainerEl().removeChild(this.el);
@@ -689,18 +705,18 @@
 
     //Rack.Router
     //----------
-    var Router = Rack.Router = function (options) {
-        var routes = this.routes,
-            controller = this.controller;
-        this.options = options || {};
-        this.routes =  this.options.routes || routes;
-        this.controller =  this.options.controller || controller;
+    var Router = Rack.Router = function (attributes) {
+        this.attributes = attributes || {};
+        var defaultRoutes = this.routes;
+        setAttributes.apply(this);
+        this.routes = Helpers.mergeObjects(defaultRoutes, this.attributes.routes);
         this.initialize.apply(this, arguments);
         this.addEventListeners();
         this.checkRoute();
     };
 
     Helpers.extend(Router, {
+        routes: {},
 
         /**
          * abstract @method initialize
@@ -712,6 +728,11 @@
         },
         removeEventListeners: function(){
             window.removeEventListener('hashchange', this.checkRoute.bind(this), false);
+        },
+        destroy: function(){
+            this.removeEventListeners();
+            setAttributes.call(this, true);
+            this.routes = {};
         },
 
         /**
@@ -756,15 +777,17 @@
 
     //Rack.Controller
     //----------
-    var Controller = Rack.Controller = function (options) {
-        this.options = options || {};
+    var Controller = Rack.Controller = function (attributes) {
+        this.attributes = attributes || {};
+        var defaultAction = this.actions;
+        setAttributes.apply(this);
+        this.actions = Helpers.mergeObjects(defaultAction, this.attributes.actions);
         this.listenersObj = {};
         this.initialize.apply(this, arguments);
     };
 
     Helpers.extend(Controller, {
         actions: {},
-
         /**
          * abstract @method initialize
          * initialization logic
@@ -777,11 +800,17 @@
         beforeDestroy: function(){},
 
         /**
-         * abstract @method beforeRender
+         * abstract @method onDestroy
          */
         onDestroy: function(){},
         destroy: function(){
-            this.listenersObj = {};
+            this.beforeDestroy();
+            Helpers.defer(function(){
+                this.listenersObj = {};
+                this.actions = {};
+                setAttributes.call(this, true);
+                this.onDestroy();
+            }, this);
         },
 
         /**
@@ -821,10 +850,5 @@
 
     Model.extend = View.extend = Router.extend = Controller.extend = extend;
 
-    //TODO:
-    // Controller:
-    //  - destroy method
-    // Helpers :
-    //  - merge method - merge 2 objects
     return Rack;
 });
