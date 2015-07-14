@@ -1,8 +1,7 @@
 # Rack.js
 
 Tiny javascript MVC-framework for working with RESTful JSON interface.
-
-...Under development...
+====================================================================
 
 ##Documentation
 
@@ -600,7 +599,6 @@ Remove route-change listener, clear binded routes and destroy all attributes.
  * [publish](#publish)
  * [destroy](#destroy)
  * [beforeDestroy and onDestroy](#beforedestroy-and-ondestroy)
- * [ondestroy](#ondestroy)
 
 #### Controller extend
 
