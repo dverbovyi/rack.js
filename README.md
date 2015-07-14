@@ -2,8 +2,6 @@
 
 Tiny javascript MVC-framework for working with RESTful JSON interface.
 
-...Under development...
-
 ##Documentation
 
 * [Rack.Model](#model)
@@ -599,10 +597,93 @@ Remove route-change listener, clear binded routes and destroy all attributes.
  * [unsubscribe](#unsubscribe)
  * [publish](#publish)
  * [destroy](#destroy)
- * [beforeDestroy](#beforeDestroy)
- * [ondestroy](#ondestroy)
+ * [beforeDestroy and onDestroy](#beforedestroy-and-ondestroy)
 
-Docs in progress
+#### Controller extend
+
+    Rack.Controller.extend(properties)
+    
+To create a Controller class of your own, you extend ```Rack.Controller``` and provide instance properties,
+as well options to be attached directly to the constructor function.
+
+extend correctly sets up the prototype chain, so subclasses created with the bellow described way
+can be further extended and subclassed as far as you like.
+Example:
+
+```javascript
+        var MyController = Rack.Controller.extend({
+            actions: {
+                "": "index",
+                "home": "home",
+                "about": "about",
+                "contacts": "contacts",
+                "any": "any"
+            },
+            initialize: function(){
+            //some initialization logic
+            }
+            ...
+        });
+```
+
+ * Brief aside on super: JavaScript does not provide a simple way to call super — the function of the same name defined
+ higher on the prototype chain. If you override a core function like ```destroy``` (```subscribe```, ```unsubscribe```, ```publish```),
+ and you want to invoke the parent object's implementation, you'll have to explicitly call it, along these lines:
+Example:
+
+```javascript
+        var MyController = Rack.Controller.extend({
+            ...
+            subscribe: function(event, callback, context){
+                MyController.__super__.subscribe.apply(this, arguments);
+                ...
+            }
+            ...
+        });
+```
+
+#### Controller initialize
+
+    new Controller([attributes])
+
+When creating an instance of a Controller, you can pass in the initial values of the attributes. 
+See example:
+
+```javascript
+        var MyController = Rack.Controller.extend({
+            actions: {
+                "": "index",
+                "home": "home",
+                "about": "about",
+                "contacts": "contacts",
+                "any": "any"
+            },
+            initialize: function(){
+                //some initialization logic
+            }
+            ...
+        });
+        var myController = new MyController({foo: 'bar'}); 
+```
+
+#### subscribe
+
+    controller.subscribe(event, callback, context)
+
+#### unsubscribe
+
+    controller.unsubscribe(event)
+
+
+#### publish
+
+    controller.publish(event, value)
+
+#### destroy
+
+    controller.destroy()
+    
+#### beforeDestroy and onDestroy
 
 ### Service
 
