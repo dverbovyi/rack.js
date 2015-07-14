@@ -5,63 +5,7 @@
 </head>
 <body>
 <h1>Tiny Framework Rack.js</h1>
-<h3>...Under development...</h3>
-
-<hr/>
-test routing example
-<ul>
-    <li>
-        <a href="#about">About</a>
-    </li>
-    <li>
-        <a href="#home">Home</a>
-    </li>
-    <li>
-        <a href="#contacts">Contacts</a>
-    </li>
-</ul>
 </body>
 <script type="text/javascript" src="./rack.js"></script>
 
-<script>
-    var MyController = Rack.Controller.extend({
-        actions: {
-            index: function(){
-                alert('index')
-            },
-            home: function(){
-                alert('home');
-            },
-            about: function(){
-                alert('about');
-            },
-            contacts: function(){
-                alert('contacts')
-            },
-            any: function(route){
-                alert('any');
-                console.log(route);
-            }
-        },
-        initialize: function(){
-            console.log('initialize Controller');
-        }
-    });
-    var MyRouter = Rack.Router.extend({
-        controller: new MyController(),
-        routes: {
-            "": "index",
-            "home": "home",
-            "about": "about",
-            "contacts": "contacts",
-            "any": "any"
-        },
-        initialize: function(params){
-            console.log('initialize Router');
-        }
-    });
-    window.onload = function(){
-        new MyRouter();
-    }
-</script>
 </html>
