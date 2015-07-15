@@ -670,14 +670,49 @@ See example:
 
     controller.subscribe(event, callback, context)
 
+Create controller custom event, initialize handler with custom context
+
+```javascript
+        myController.subscribe('done', function(data) {
+        ...
+        }, context)
+```
+
+If you want that handler was the same for several events,
+you should pass the first arguments as Array, See Example:
+
+```javascript
+        myController.subscribe(['done', 'ready'], function(data){
+        ...
+        }, context);
+```
+
 #### unsubscribe
 
     controller.unsubscribe(event)
+
+Remove controller event and unbind handler
+
+```javascript
+        myController.unsubscribe('done')
+```
+
+If you want to unbind all handlers from several events you should pass the first arguments as Array, See Example:
+
+```javascript
+        myController.unsubscribe(['done', 'ready'])
+```
 
 
 #### publish
 
     controller.publish(event, value)
+
+Trigger your custom event with corresponding data
+
+```javascript
+        myController.publish(['done', {})
+``` 
 
 #### destroy
 
