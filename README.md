@@ -725,7 +725,24 @@ Trigger your custom event with corresponding data
 
     controller.destroy()
     
+Clean listeners, actions and remove controller attributes
+
 #### beforeDestroy and onDestroy
+
+Define this method to describe some logic before and after controller destroy
+
+```javascript
+        var MyController = Rack.Controller.extend({
+        ...
+        beforeDestroy: function(){
+            console.log('Controller\'s data will be destroyed soon')
+        },
+        onDestroy: function(){
+            console.log('Controller\'s data has already destroyed')
+        },
+        ...
+        })
+```
 
 ### Service
 
