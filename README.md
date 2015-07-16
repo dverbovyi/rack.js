@@ -423,6 +423,7 @@ Removes a view and view's template from the DOM, remove any bound events and uns
  * [routes](#routes)
  * [getHash](#gethash)
  * [navigate](#navigate)
+ * [removeRoute](#removeroute)
  * [stop](#stop)
 
 #### Router extend
@@ -582,6 +583,12 @@ To implement forced navigation or redirection use ```navigate```:
 ```javascript
     router.navigate('about/me')
 ```
+
+#### removeRoute
+
+    router.removeRoute(route)
+    
+Remove route
 
 #### stop
 
