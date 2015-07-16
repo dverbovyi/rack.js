@@ -594,7 +594,7 @@ Remove route
 
     router.stop()
     
-Remove route-change listener, clear binded routes and destroy all attributes.
+Remove hashChange listener, clear binded routes and destroy all attributes.
 
 ### Controller
 
