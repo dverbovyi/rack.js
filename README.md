@@ -352,7 +352,7 @@ Binding all DOM events listeners to your view.el. This method applied with View'
 Unbinding your view DOM events. Called automaticaly with ```view.remove()```
 
 
-#### beforeRender and onRender event
+#### beforeRender and onRender events
 
 Define this methods if you want to describe some logic before/after view rendering, e.g:
 
