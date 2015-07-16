@@ -90,7 +90,7 @@
     // Rack.Helpers
     //----------------
     var Helpers = Rack.Helpers = function () {
-        throw new Error("The instance shouldn\'t be created");
+        throw new Error("Static class. The instance cannot be created");
     };
 
     /**
@@ -231,7 +231,7 @@
     // Rack.Service
     //----------------
     var Service = Rack.Service = function () {
-        throw new Error("The instance shouldn\'t be created");
+        throw new Error("Static class. The instance cannot be created");
     };
 
     /**
@@ -244,6 +244,7 @@
      * @param {Boolean} async
      */
     Service.sendRequest = function (url, data, method, resolve, reject, async) {
+        //TODO: format data if using GET
         var asyncReq = async || true;
         var xhr = (function () {
             var xmlhttp;
@@ -281,7 +282,7 @@
      * @param {Boolean} async
      * @returns {Promise}
      */
-    Service.get = function (url, async) {
+    Service.get = function (url, async) { //TODO passing data using GET
         return new Promise(function (resolve, reject) {
             this.sendRequest(url, null, 'GET', resolve, reject, async);
         }.bind(this));
