@@ -14,9 +14,9 @@ Tiny javascript MVC-framework for working with RESTful JSON interface.
 
 ### Model
 
- * [extend](#extend)
- * [initialize](#initialize)
- * [get](#get)
+ * [extend](#model-extend)
+ * [initialize](#model-initialize)
+ * [get](#model-get)
  * [set](#set)
  * [unset](#unset)
  * [clear](#clear)
@@ -25,7 +25,7 @@ Tiny javascript MVC-framework for working with RESTful JSON interface.
  * [toJSON](#tojson)
 
 
-#### extend
+#### Model extend
 
     Rack.Model.extend(properties)
 
@@ -59,7 +59,7 @@ Example:
 ```
 
 
-#### initialize
+#### Model initialize
 
     new Model([attributes])
 
@@ -74,7 +74,7 @@ If you define an initialize function, it will be invoked when the model is creat
 ```
 
 
-#### get
+#### Model get
 
     model.get(attribute)
 
@@ -746,8 +746,64 @@ Define this methods to describe some logic before and after controller destroy
 
 ### Service
 
-Docs in progress
+* [sendRequest](#sendrequest)
+* [get](#get)
+* [post](#post)
+
+Service is static class. The instance can't be created
+
+#### sendRequest
+
+     * @param {String} url
+     * @param {*} data
+     * @param {String} method
+     * @param {Function} resolve
+     * @param {Function} reject
+     * @param {Boolean} async
+     
+    Rack.Service.sendRequest(url, data, method, resolve, reject, async)
+    
+Send request method using XMLHttpRequest.
+
+#### get
+
+     * @param {String} url
+     * @param {Boolean} async
+     * @returns {Promise}
+     
+    Rack.Service.get(url, async)
+    
+Send request using http method GET. Return ```Promise``` object. Basic use example:
+
+```javascript
+        Rack.Service.get(url, true).then(resolveCallback, rejectCallback)
+```
+
+#### post
+
+     * @param {String} url
+     * @param {*} data
+     * @param {Boolean} async
+     * @returns {Promise}
+     
+     Rack.Service.post(url, data, async)
+     
+Send request using http method POST. Return ```Promise``` object. Basic use example:
+
+```javascript
+        Rack.Service.post(url, {name: 'Peter'}, true).then(resolveCallback, rejectCallback)
+```
 
 ### Helpers
 
-Under development
+* [extend](#extend)
+* [clone](#clone)
+* [getType](#getyype)
+* [uniqueArray](#uniquearray)
+* [defer](#defer)
+* [getEl](#getel)
+* [mergeObjects](#mergeobjects)
+
+Helpers is static class. The instance cannot be created.
+
+Docs in progress
