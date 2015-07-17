@@ -1,7 +1,6 @@
 /**
- * User: Dmytro
- * Date: 14.03.15
- * Time: 20:57
+  * author: Dmytro Verbovyi
+  * https://github.com/dverbovyi/rack.js
  */
 
 (function (root, factory) {
@@ -11,7 +10,7 @@
 
     /**
      *
-     * @param {Object } protoProps
+     * @param {Object} protoProps
      * @returns {Function}
      */
     var extend = function (protoProps) {
@@ -244,7 +243,6 @@
      * @param {Boolean} async
      */
     Service.sendRequest = function (url, data, method, resolve, reject, async) {
-        //TODO: format data if using GET
         var asyncReq = async || true;
         var xhr = (function () {
             var xmlhttp;
@@ -279,12 +277,24 @@
     /**
      *
      * @param {String} url
+     * @param {JSON} data
      * @param {Boolean} async
      * @returns {Promise}
      */
-    Service.get = function (url, async) { //TODO passing data using GET
+    Service.get = function (url, data, async) {
+        var paramsString = '',
+            keys = data&&Object.keys(data);
+        if(keys) {
+            for(var i=0;i<keys.length;i++){
+                if(!i)
+                    paramsString = '?';
+                paramsString += keys[i]+'='+data[keys[i]];
+                if(i!=keys.length-1)
+                    paramsString += '&';
+            }
+        }
         return new Promise(function (resolve, reject) {
-            this.sendRequest(url, null, 'GET', resolve, reject, async);
+            this.sendRequest(url+paramsString, null, 'GET', resolve, reject, async);
         }.bind(this));
     };
 
@@ -484,7 +494,7 @@
         getContainerEl: function () {
             if (!this.parentEl) {
                 var parentEl = Helpers.getEl(this.container);
-                this.parentEl = Helpers.getType(Array.prototype.slice.call(parentEl)) === 'Array' ? parentEl[0] : parentEl;
+                this.parentEl = [].slice.call(parentEl).length? parentEl[0] : parentEl;
             }
             return this.parentEl;
         },
@@ -708,8 +718,9 @@
     //----------
     var Router = Rack.Router = function (attributes) {
         this.attributes = attributes || {};
-        this.controller = {};
-        var defaultRoutes = this.routes;
+        var defaultRoutes = this.routes,
+            controller = this.controller;
+        this.controller = controller || {};
         setAttributes.apply(this);
         this.routes = Helpers.mergeObjects(defaultRoutes, this.attributes.routes);
         this.initialize.apply(this, arguments);
@@ -749,20 +760,15 @@
             params.forEach(function(v){
                 if(v.length) args.push(v);
             });
-            var hashPath = route+'/'+params.join('/'),
-                navigateTo = hashPath;
+            var hashPath = route+'/'+params.join('/');
             if (routes[route]) {
-                try {
-                    this.controller.actions[routes[route]].call(this.controller, route, args);
-                } catch (e){
-                    throw new Error("Method '"+routes[route]+"' doesn\'t exist in Controller\'s actions");
-                }
-                navigateTo = params.length&&hashPath || route;
+                var hash = params.length&&hashPath || route;
+                location.hash = hash;
+                if(this.currRoute==hash)
+                    this.controller.actions[routes[route]].call(this.controller, route, args, this);
             } else if(routes['any']){
-                navigateTo = 'any';
-            } else
-                navigateTo = hashPath;
-            location.hash = navigateTo;
+                location.hash = 'any';
+            }
         },
         getHash: function () {
             return window.location.hash.substring(1);
@@ -773,8 +779,9 @@
          * @param {Object} e - HashChangeEvent
          */
         checkRoute: function (e) {
-            if (!e || e.returnValue){
-                this.navigate(this.getHash());
+            if(this.currRoute!=this.getHash()){
+                this.currRoute = this.getHash();
+                this.navigate(this.currRoute);
             }
         }
     });
