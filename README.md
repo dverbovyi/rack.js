@@ -600,6 +600,7 @@ Remove hashChange listener, clear binded routes and destroy all attributes.
 
  * [extend](#controller-extend)
  * [initialize](#controller-initialize)
+ * [actions](#actions)
  * [subscribe](#subscribe)
  * [unsubscribe](#unsubscribe)
  * [publish](#publish)
@@ -672,6 +673,12 @@ See example:
         });
         var myController = new MyController({foo: 'bar'}); 
 ```
+
+#### actions
+
+    controller.actions
+    
+Docs in progress
 
 #### subscribe
 
