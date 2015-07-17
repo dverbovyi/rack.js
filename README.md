@@ -600,6 +600,7 @@ Remove hashChange listener, clear binded routes and destroy all attributes.
 
  * [extend](#controller-extend)
  * [initialize](#controller-initialize)
+ * [actions](#actions)
  * [subscribe](#subscribe)
  * [unsubscribe](#unsubscribe)
  * [publish](#publish)
@@ -672,6 +673,12 @@ See example:
         });
         var myController = new MyController({foo: 'bar'}); 
 ```
+
+#### actions
+
+    controller.actions
+    
+Docs in progress
 
 #### subscribe
 
@@ -768,15 +775,16 @@ Send request method using XMLHttpRequest.
 #### get
 
      * @param {String} url
+     * @param {JSON} data
      * @param {Boolean} async
      * @returns {Promise}
      
-    Rack.Service.get(url, async)
+    Rack.Service.get(url, data, async)
     
 Send request using http method GET. Return ```Promise``` object. Basic use example:
 
 ```javascript
-        Rack.Service.get(url, true).then(resolveCallback, rejectCallback)
+        Rack.Service.get(url, {'name':'Peter'}, true).then(resolveCallback, rejectCallback)
 ```
 
 #### post
@@ -798,7 +806,7 @@ Send request using http method POST. Return ```Promise``` object. Basic use exam
 
 * [extend](#extend)
 * [clone](#clone)
-* [getType](#getyype)
+* [getType](#gettype)
 * [uniqueArray](#uniquearray)
 * [defer](#defer)
 * [getEl](#getel)
