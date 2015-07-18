@@ -277,25 +277,22 @@
     /**
      *
      * @param {String} url
-     * @param {JSON} data
      * @param {Boolean} async
      * @returns {Promise}
      */
-    Service.get = function (url, data, async) {
-        var paramsString = '',
-            keys = data&&Object.keys(data);
-        if(keys) {
-            for(var i=0;i<keys.length;i++){
-                if(!i)
-                    paramsString = '?';
-                paramsString += keys[i]+'='+data[keys[i]];
-                if(i!=keys.length-1)
-                    paramsString += '&';
+    Service.get = function (url, async) {
+        try {
+            return new Promise(function (resolve, reject) {
+                this.sendRequest(url, null, 'GET', resolve, reject, async);
+            }.bind(this));
+        } catch (e) {
+            return {
+                then: function(resolve, reject){
+                    this.sendRequest(url, null, 'GET', resolve, reject, async);
+                }.bind(this)
             }
         }
-        return new Promise(function (resolve, reject) {
-            this.sendRequest(url+paramsString, null, 'GET', resolve, reject, async);
-        }.bind(this));
+
     };
 
     /**
@@ -306,9 +303,17 @@
      * @returns {Promise}
      */
     Service.post = function (url, data, async) {
-        return new Promise(function (resolve, reject) {
-            this.sendRequest(url, data, 'POST', resolve, reject, async);
-        }.bind(this));
+        try {
+            return new Promise(function (resolve, reject) {
+                this.sendRequest(url, data, 'POST', resolve, reject, async);
+            }.bind(this));
+        } catch(e) {
+            return {
+                then: function(resolve, reject){
+                    this.sendRequest(url, data, 'POST', resolve, reject, async);
+                }.bind(this)
+            }
+        }
     };
     //-----------------------
 
