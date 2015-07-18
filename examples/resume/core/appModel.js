@@ -3,5 +3,21 @@
  * User: Dmytro
  * Date: 17.07.15
  * Time: 23:21
- * To change this template use File | Settings | File Templates.
  */
+
+define([
+    'Rack'
+], function(Rack){
+    var AppModel = Rack.Model.extend({
+        defaults:{
+            name: 'Dmytro',
+            surname: 'Verbovyi',
+            title: 'web developer'
+        },
+        initialize: function(){
+            console.log('AppModel');
+        }
+    });
+
+    return AppModel;
+});

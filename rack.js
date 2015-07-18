@@ -610,18 +610,21 @@
                     },
                     escapePattern = /\\|\[|\]|'|\r|\n|\t|\u2028|\u2029/g,
                     trimedSource = source.replace(/\s+/g, ''),
-                    splited = trimedSource.match(/{{(.*)}}/g)[0].split('{{');
-                splited.shift();
-                splited.forEach(function (val) {
-                    var key = val.split('}}')[0];
-                    templateKeys.push(key);
-                });
-                Helpers.uniqueArray(templateKeys).forEach(function (val) {
-                    var key = val.replace(escapePattern, function (match) {
-                        return '\\' + escapes[match]
+                    matched = trimedSource.match(/{{(.*)}}/g),
+                    splited = matched&&matched[0].split('{{');
+                if(splited) {
+                    splited.shift();
+                    splited.forEach(function (val) {
+                        var key = val.split('}}')[0];
+                        templateKeys.push(key);
                     });
-                    source = source.replace(new RegExp('{{' + key + '}}', "g"), this.getParsedModelValue(val));
-                }.bind(this));
+                    Helpers.uniqueArray(templateKeys).forEach(function (val) {
+                        var key = val.replace(escapePattern, function (match) {
+                            return '\\' + escapes[match]
+                        });
+                        source = source.replace(new RegExp('{{' + key + '}}', "g"), this.getParsedModelValue(val));
+                    }.bind(this));
+                }
             }
             this.el.innerHTML = source;
             this.setupViewEvents();

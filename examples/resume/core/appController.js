@@ -6,16 +6,17 @@
  */
 define([
     'Rack',
+    'appModel',
     'indexView'
-], function(Rack, IndexView){
+], function(Rack, AppModel, IndexView){
     var AppController = Rack.Controller.extend({
         initialize: function(){
-            console.log('AppController');
+            this.appModel = new AppModel();
         },
         actions: {
             index: function(route, params, router){
                 if(!this.indexView)
-                    this.indexView = new IndexView();
+                    this.indexView = new IndexView({model: this.appModel});
             },
             notFound: function(route, params, router){
                 alert('Route not found');

@@ -14,6 +14,7 @@ define([
         templateId: 'indexTemplate',
         initialize: function(){
             console.log('IndexView');
+            console.log(this);
         }
     });
 
