@@ -9,11 +9,7 @@ define([
     'Rack'
 ], function(Rack){
     var AppModel = Rack.Model.extend({
-        defaults:{
-            name: 'Dmytro',
-            surname: 'Verbovyi',
-            title: 'web developer'
-        },
+        defaults:{},
         initialize: function(){
             console.log('AppModel');
         }

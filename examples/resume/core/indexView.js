@@ -13,8 +13,9 @@ define([
         container: '#container',
         templateId: 'indexTemplate',
         initialize: function(){
-            console.log('IndexView');
-            console.log(this);
+            this.registerHelper('skills', function(e){
+                console.log(e);
+            });
         }
     });
 

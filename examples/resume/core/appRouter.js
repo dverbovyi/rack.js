@@ -9,7 +9,6 @@ define([
     'appController'
 ], function(Rack, AppController){
     var AppRouter = Rack.Router.extend({
-        controller: new AppController(),
         routes: {
             "": "index",
             "any": "notFound"

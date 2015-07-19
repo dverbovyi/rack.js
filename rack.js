@@ -726,9 +726,8 @@
     //----------
     var Router = Rack.Router = function (attributes) {
         this.attributes = attributes || {};
-        var defaultRoutes = this.routes,
-            controller = this.controller;
-        this.controller = controller || {};
+        var defaultRoutes = this.routes;
+        this.controller = this.attributes.controller || {};
         setAttributes.apply(this);
         this.routes = Helpers.mergeObjects(defaultRoutes, this.attributes.routes);
         this.initialize.apply(this, arguments);

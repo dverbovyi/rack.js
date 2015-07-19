@@ -10,8 +10,10 @@ define([
     'indexView'
 ], function(Rack, AppModel, IndexView){
     var AppController = Rack.Controller.extend({
-        initialize: function(){
-            this.appModel = new AppModel();
+        initialize: function(data){
+            this.subscribe('dataReady', function(e){
+                this.appModel = new AppModel(e.value);
+            }, this);
         },
         actions: {
             index: function(route, params, router){
