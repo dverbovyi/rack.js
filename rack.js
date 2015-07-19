@@ -660,7 +660,8 @@
                 this.id && this.el.setAttribute('id', this.id);
                 this.className && this.el.setAttribute('class', this.className);
             }
-            this.el.dispatchEvent(new CustomEvent('beforeRender')); //TODO IE doesn't support this one
+            var event = window.CustomEvent&&new CustomEvent('beforeRender')  || document.createEvent("beforeRender");
+            this.el.dispatchEvent(event);
             if (!this.template)
                 this.template = Helpers.getEl('#' + this.templateId);
             if (this.template)
