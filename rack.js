@@ -570,7 +570,7 @@
                         var chainKey = key.split('.');
                         chainKey.forEach(function (arrVal) {
                             prevModelValue = modelValue;
-                            modelValue = modelValue && modelValue[arrVal] || this.helpers[arrVal] || this.model.get(arrVal);
+                            modelValue = this.helpers[arrVal] || modelValue && modelValue[arrVal] || this.model.get(arrVal);
                             if (typeof modelValue === "undefined" && typeof prevModelValue != "undefined") {
                                 parser(arrVal);
                             }
@@ -585,7 +585,7 @@
                                 prop: v.indexOf('.') + 1 ? v.split(']')[1].substr(1) : false
                             }
                         });
-                        prevModelValue = prevModelValue && prevModelValue[arrName] || this.helpers[arrName] || this.model.get(arrName);
+                        prevModelValue = this.helpers[arrName] || prevModelValue && prevModelValue[arrName] || this.model.get(arrName);
                         indexArr.forEach(function (v) {
                             modelValue = modelValue && modelValue[v.index] || prevModelValue[v.index];
                             v.prop && parser(v.prop);
@@ -660,7 +660,7 @@
                 this.id && this.el.setAttribute('id', this.id);
                 this.className && this.el.setAttribute('class', this.className);
             }
-            this.el.dispatchEvent(new CustomEvent('beforeRender'));
+            this.el.dispatchEvent(new CustomEvent('beforeRender')); //TODO IE doesn't support this one
             if (!this.template)
                 this.template = Helpers.getEl('#' + this.templateId);
             if (this.template)
