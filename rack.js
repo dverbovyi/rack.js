@@ -1,7 +1,6 @@
 /**
- * User: Dmytro
- * Date: 14.03.15
- * Time: 20:57
+  * author: Dmytro Verbovyi
+  * https://github.com/dverbovyi/rack.js
  */
 
 (function (root, factory) {
@@ -11,7 +10,7 @@
 
     /**
      *
-     * @param {Object } protoProps
+     * @param {Object} protoProps
      * @returns {Function}
      */
     var extend = function (protoProps) {
@@ -90,7 +89,7 @@
     // Rack.Helpers
     //----------------
     var Helpers = Rack.Helpers = function () {
-        throw new Error("The instance shouldn\'t be created");
+        throw new Error("Static class. The instance cannot be created");
     };
 
     /**
@@ -231,7 +230,7 @@
     // Rack.Service
     //----------------
     var Service = Rack.Service = function () {
-        throw new Error("The instance shouldn\'t be created");
+        throw new Error("Static class. The instance cannot be created");
     };
 
     /**
@@ -261,11 +260,10 @@
             }
             return xmlhttp;
         })();
-
         xhr.open(method, url, asyncReq);
         xhr.onreadystatechange = function () {
-            if (this.readyState == 4) {
-                if (this.status == 200) {
+            if (xhr.readyState == 4) {
+                if (xhr.status == 200) {
                     resolve(xhr.responseText);
                 } else {
                     reject(xhr);
@@ -282,9 +280,18 @@
      * @returns {Promise}
      */
     Service.get = function (url, async) {
-        return new Promise(function (resolve, reject) {
-            this.sendRequest(url, null, 'GET', resolve, reject, async);
-        }.bind(this));
+        try {
+            return new Promise(function (resolve, reject) {
+                this.sendRequest(url, null, 'GET', resolve, reject, async);
+            }.bind(this));
+        } catch (e) {
+            return {
+                then: function(resolve, reject){
+                    this.sendRequest(url, null, 'GET', resolve, reject, async);
+                }.bind(this)
+            }
+        }
+
     };
 
     /**
@@ -295,9 +302,17 @@
      * @returns {Promise}
      */
     Service.post = function (url, data, async) {
-        return new Promise(function (resolve, reject) {
-            this.sendRequest(url, data, 'POST', resolve, reject, async);
-        }.bind(this));
+        try {
+            return new Promise(function (resolve, reject) {
+                this.sendRequest(url, data, 'POST', resolve, reject, async);
+            }.bind(this));
+        } catch(e) {
+            return {
+                then: function(resolve, reject){
+                    this.sendRequest(url, data, 'POST', resolve, reject, async);
+                }.bind(this)
+            }
+        }
     };
     //-----------------------
 
@@ -483,7 +498,7 @@
         getContainerEl: function () {
             if (!this.parentEl) {
                 var parentEl = Helpers.getEl(this.container);
-                this.parentEl = Helpers.getType(Array.prototype.slice.call(parentEl)) === 'Array' ? parentEl[0] : parentEl;
+                this.parentEl = [].slice.call(parentEl).length? parentEl[0] : parentEl;
             }
             return this.parentEl;
         },
@@ -554,7 +569,7 @@
                         var chainKey = key.split('.');
                         chainKey.forEach(function (arrVal) {
                             prevModelValue = modelValue;
-                            modelValue = modelValue && modelValue[arrVal] || this.helpers[arrVal] || this.model.get(arrVal);
+                            modelValue = this.helpers[arrVal] || modelValue && modelValue[arrVal] || this.model.get(arrVal);
                             if (typeof modelValue === "undefined" && typeof prevModelValue != "undefined") {
                                 parser(arrVal);
                             }
@@ -569,7 +584,7 @@
                                 prop: v.indexOf('.') + 1 ? v.split(']')[1].substr(1) : false
                             }
                         });
-                        prevModelValue = prevModelValue && prevModelValue[arrName] || this.helpers[arrName] || this.model.get(arrName);
+                        prevModelValue = this.helpers[arrName] || prevModelValue && prevModelValue[arrName] || this.model.get(arrName);
                         indexArr.forEach(function (v) {
                             modelValue = modelValue && modelValue[v.index] || prevModelValue[v.index];
                             v.prop && parser(v.prop);
@@ -594,18 +609,21 @@
                     },
                     escapePattern = /\\|\[|\]|'|\r|\n|\t|\u2028|\u2029/g,
                     trimedSource = source.replace(/\s+/g, ''),
-                    splited = trimedSource.match(/{{(.*)}}/g)[0].split('{{');
-                splited.shift();
-                splited.forEach(function (val) {
-                    var key = val.split('}}')[0];
-                    templateKeys.push(key);
-                });
-                Helpers.uniqueArray(templateKeys).forEach(function (val) {
-                    var key = val.replace(escapePattern, function (match) {
-                        return '\\' + escapes[match]
+                    matched = trimedSource.match(/{{(.*)}}/g),
+                    splited = matched&&matched[0].split('{{');
+                if(splited) {
+                    splited.shift();
+                    splited.forEach(function (val) {
+                        var key = val.split('}}')[0];
+                        templateKeys.push(key);
                     });
-                    source = source.replace(new RegExp('{{' + key + '}}', "g"), this.getParsedModelValue(val));
-                }.bind(this));
+                    Helpers.uniqueArray(templateKeys).forEach(function (val) {
+                        var key = val.replace(escapePattern, function (match) {
+                            return '\\' + escapes[match]
+                        });
+                        source = source.replace(new RegExp('{{' + key + '}}', "g"), this.getParsedModelValue(val));
+                    }.bind(this));
+                }
             }
             this.el.innerHTML = source;
             this.setupViewEvents();
@@ -614,12 +632,12 @@
         /**
          * abstract @method beforeRender
          */
-        beforeRender: function (e) {},
+        beforeRender: function (e) {alert('before')},
 
         /**
          * abstract @method onRender
          */
-        onRender: function (e) {},
+        onRender: function (e) {alert('onRender')},
         addEventListeners: function () {
             this.el.addEventListener('beforeRender', this.beforeRender.bind(this), false);
             this.el.addEventListener('onRender', this.onRender.bind(this), false);
@@ -641,7 +659,13 @@
                 this.id && this.el.setAttribute('id', this.id);
                 this.className && this.el.setAttribute('class', this.className);
             }
-            this.el.dispatchEvent(new CustomEvent('beforeRender'));
+            try {
+                this.el.dispatchEvent(new CustomEvent('beforeRender'));
+            } catch(e) {
+                var evt = document.createEvent("Event");
+                evt.initEvent("beforeRender", true, false);
+                this.el.dispatchEvent(evt); 
+            }
             if (!this.template)
                 this.template = Helpers.getEl('#' + this.templateId);
             if (this.template)
@@ -668,7 +692,13 @@
             }
             this.getContainerEl().appendChild(this.el);
             Helpers.defer(function () {
-                this.el.dispatchEvent(new CustomEvent('onRender'));
+                try {
+                    this.el.dispatchEvent(new CustomEvent('onRender'));
+                } catch(e) {
+                   var evt = document.createEvent("Event");
+                    evt.initEvent("onRender", true, false);
+                    this.el.dispatchEvent(evt); 
+                }
             }, this);
         },
         setupViewEvents: function () {
@@ -707,8 +737,8 @@
     //----------
     var Router = Rack.Router = function (attributes) {
         this.attributes = attributes || {};
-        this.controller = {};
         var defaultRoutes = this.routes;
+        this.controller = this.attributes.controller || {};
         setAttributes.apply(this);
         this.routes = Helpers.mergeObjects(defaultRoutes, this.attributes.routes);
         this.initialize.apply(this, arguments);
@@ -748,20 +778,15 @@
             params.forEach(function(v){
                 if(v.length) args.push(v);
             });
-            var hashPath = route+'/'+params.join('/'),
-                navigateTo = hashPath;
+            var hashPath = route+'/'+params.join('/');
             if (routes[route]) {
-                try {
-                    this.controller.actions[routes[route]].call(this.controller, route, args);
-                } catch (e){
-                    throw new Error("Method '"+routes[route]+"' doesn\'t exist in Controller\'s actions");
-                }
-                navigateTo = params.length&&hashPath || route;
+                var hash = params.length&&hashPath || route;
+                location.hash = hash;
+                if(this.currRoute==hash)
+                    this.controller.actions[routes[route]].call(this.controller, route, args, this);
             } else if(routes['any']){
-                navigateTo = 'any';
-            } else
-                navigateTo = hashPath;
-            location.hash = navigateTo;
+                location.hash = 'any';
+            }
         },
         getHash: function () {
             return window.location.hash.substring(1);
@@ -772,8 +797,9 @@
          * @param {Object} e - HashChangeEvent
          */
         checkRoute: function (e) {
-            if (!e || e.returnValue){
-                this.navigate(this.getHash());
+            if(this.currRoute!=this.getHash()){
+                this.currRoute = this.getHash();
+                this.navigate(this.currRoute);
             }
         }
     });
