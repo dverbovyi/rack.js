@@ -632,12 +632,12 @@
         /**
          * abstract @method beforeRender
          */
-        beforeRender: function (e) {alert('before')},
+        beforeRender: function (e) {},
 
         /**
          * abstract @method onRender
          */
-        onRender: function (e) {alert('onRender')},
+        onRender: function (e) {},
         addEventListeners: function () {
             this.el.addEventListener('beforeRender', this.beforeRender.bind(this), false);
             this.el.addEventListener('onRender', this.onRender.bind(this), false);
