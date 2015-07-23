@@ -622,11 +622,10 @@ Example:
 ```javascript
         var MyController = Rack.Controller.extend({
             actions: {
-                "": "index",
-                "home": "home",
-                "about": "about",
-                "contacts": "contacts",
-                "any": "any"
+                index: function(){},
+                home: function(){},
+                about: function(){},
+                notFoundAction: function(){},
             },
             initialize: function(){
             //some initialization logic
@@ -661,12 +660,12 @@ See example:
 ```javascript
         var MyController = Rack.Controller.extend({
             actions: {
-                "": "index",
-                "home": "home",
-                "about": "about",
-                "contacts": "contacts",
-                "any": "any"
+                index: function(){},
+                home: function(){},
+                about: function(){},
+                notFoundAction: function(){},
             },
+            index
             initialize: function(){
                 //some initialization logic
             }
