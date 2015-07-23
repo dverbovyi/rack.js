@@ -818,4 +818,4 @@ Docs in progress
 
 ### examples
 
- * [personal web-resume site](https://github.com/dverbovyi/web-resume) - [live-demo](http://dmytro.floyd.in.ua)
+ * [personal web-resume site](https://github.com/dverbovyi/web-resume)
