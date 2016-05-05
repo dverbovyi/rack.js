@@ -1,6 +1,6 @@
 # Rack.js
 
-Tiny javascript MVC-framework for working with RESTful JSON interface. (development in progress)
+Tiny javascript MVC-framework for working with RESTful JSON interface. (Inspired by [Backbone.js](https://github.com/jashkenas/backbone)
 
 ##Documentation
 
