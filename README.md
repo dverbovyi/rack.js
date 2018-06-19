@@ -10,7 +10,6 @@ Tiny javascript MVC-framework for working with RESTful JSON interface. (Inspired
 * [Rack.Controller](#controller)
 * [Rack.Service](#service)
 * [Rack.Helpers](#helpers)
-* [examples](#examples)
 
 
 ### Model
@@ -815,7 +814,3 @@ Send request using http method POST. Return ```Promise``` object. Basic use exam
 Helpers is static class. The instance cannot be created.
 
 Docs in progress
-
-### examples
-
- * [personal web-resume site](https://github.com/dverbovyi/web-resume)
