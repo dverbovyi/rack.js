@@ -2,7 +2,7 @@
 
 Tiny javascript MVC-framework for working with RESTful JSON interface. (Inspired by [Backbone.js](https://github.com/jashkenas/backbone))
 
-##Documentation
+## Documentation
 
 * [Rack.Model](#model)
 * [Rack.View](#view)
